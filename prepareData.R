@@ -11,25 +11,19 @@ names(table)[4] <- "n"
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
 shp <- readOGR("GloNAF_modified",dsn=wd_shp)
 
-
-reg_match <- shp@data[,c("Region","Region2")]
-
-
-
-# table2 <- table[which(table$year > 1969),]
-# table3 <- table2[which(table2$year < 2020),]
-
-
-#add "Region" to table (comes with Region2) to match names in master file
-table4 <- merge(table3,reg_match,by.x = "griisRegion",by.y = "Region2",
-                sort = F, all.x = T)
-
 #create column with species and region info
-table4$sps_reg <- paste0(table4$species,"_",table4$Region)
+table$sps_reg <- paste0(table$species,"_",table$OBJIDsic)
 
-#load amphibian master file
-setwd("/gpfs1/data/idiv_meyer/01_projects/eduardo/sTWIST")
-master_file <- read.csv("GRIISAmph_FirstRecords_FromHanno4Dec2020_AmphOnly.xlxs.csv")
+#load GloNAF master file
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF")
+
+sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv")
+
+regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv")
+
+#make a table to include region name and obj ID into the table with countings
+merge_tab <- regions[,c(1,3,5)]
+
 
 master_file$sps_reg <- paste0(master_file$Taxon,"_",
                               master_file$Location)
