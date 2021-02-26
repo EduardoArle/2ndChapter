@@ -1,34 +1,64 @@
 library(plyr);library(rgdal);library(raster)
 
+#load table with occurrence counts (calculated in previous scripts)
 wd.data <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/Results"
 
 setwd(wd.data)
 table <- readRDS("Occurrence_region_count")
 
-names(table)[4] <- "n"
+names(table)[4] <- "n" #rename species counting column
 
-#load GloNAF shp
+#load GloNAF shp (modified version to deal with overlaps)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
 shp <- readOGR("GloNAF_modified",dsn=wd_shp)
 
-#create column with species and region info
-table$sps_reg <- paste0(table$species,"_",table$OBJIDsic)
-
-#load GloNAF master file
+#load GloNAF master file (downloaded from GloNAF)
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF")
 
-sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv")
+sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv") #saved again, original was saved with tab or so
 
-regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv")
+regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv") #table translating regions ID, names etc
 
-#make a table to include region name and obj ID into the table with countings
+#make a table to include region name and obj ID into the tables
 merge_tab <- regions[,c(1,3,5)]
 
+#include region names and obj ID into the table with occurrence counts
+table2 <- merge(table,merge_tab,by="OBJIDsic",sort = F, all.x = T)
 
-master_file$sps_reg <- paste0(master_file$Taxon,"_",
-                              master_file$Location)
+#include region names and obj ID into the GloNAF table
+sps_reg_list2 <- merge(sps_reg_list,merge_tab,by="region_id",sort = F, all.x = T)
+  
+#create column with species and region info in the occurrence count table
+table2$sps_reg <- paste0(table2$species,"_",table2$OBJIDsic)
 
-#eliminate rows combining sps/reg that are not listed in the master file
+#create column with species and region info in the GloNAF table
+sps_reg_list2$sps_reg <- paste0(sps_reg_list2$standardized_name,"_",
+                                sps_reg_list2$OBJIDsic)
+
+#eliminate rows combining sps/reg that are not listed in the GloNAF table
+table3 <- table2[which(table2$sps_reg %in% sps_reg_list2$sps_reg),]
+
+#check which sps_region combination in the GloNAF table have at least one GBIF occurrence
+sps_reg_list2$confirmed <- as.numeric(sps_reg_list2$sps_reg %in% 
+                                      table3$sps_reg)
+
+#check if there are enough records in the region to model the species occurrence
+#currently checking if there are 50 records in the region
+#think about better solution, Tiffany may be able to help
+
+#count overall number of records per region
+table3_b <- ddply(table3, .(sps_reg), summarise, sum(n)) 
+names(table3_b)[2] <- "n" #rename column
+
+#eliminate rows with less than 50 records
+table3_c <- table3_b[which(table3_b$n >= 50),]
+
+#check which sps_region combination in the GloNAF table have at least 50 GBIF occurrences
+sps_reg_list2$enough_recs <- as.numeric(sps_reg_list2$sps_reg %in% 
+                                        table3_c$sps_reg)
+
+
+
 
 #create column informing to with lustre the occurrences belong
 table4$lustre <- floor((table4$year - 1970) / 5) + 1
@@ -39,9 +69,6 @@ table5 <- ddply(table4,.(species,Region,sps_reg,lustre),
 
 #eliminate rows with combination sps_reg_n_5y < 10
 table6 <- table5[-which(table5$n_5y < 10),]
-
-#eliminate rows with combination sps_reg not contained in the master_file
-table7 <- table6[which(table6$sps_reg %in% master_file$sps_reg),]
 
 #count how many periods of five years per region have at least 10 rec
 table8 <- ddply(table7,.(Region),nrow)
