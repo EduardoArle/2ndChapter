@@ -1,4 +1,4 @@
-library(plyr);library(rgdal);library(raster)
+library(plyr);library(rgdal);library(raster);library(data.table)
 
 #load table with occurrence counts (calculated in previous scripts)
 wd.data <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/Results"
@@ -58,33 +58,48 @@ sps_reg_list2$enough_recs <- as.numeric(sps_reg_list2$sps_reg %in%
                                         table3_c$sps_reg)
 
 
+### calculate the range dynamics evidence
 
+#eliminate rows corresponding to years before 1980 and after 2019
+#as well as rows not containing year information
+
+table4 <- table3[which(!is.na(table3$year)),]
+table4 <- table4[which(table4$year >= 1970 &
+                       table4$year <= 2019),]
 
 #create column informing to with lustre the occurrences belong
 table4$lustre <- floor((table4$year - 1970) / 5) + 1
 
 #count sps_reg occurrence in the 5 year period
-table5 <- ddply(table4,.(species,Region,sps_reg,lustre),
+table5 <- ddply(table4,.(species,OBJIDsic,sps_reg,lustre),
                 summarise, n_5y = sum(n))
 
 #eliminate rows with combination sps_reg_n_5y < 10
 table6 <- table5[-which(table5$n_5y < 10),]
 
 #count how many periods of five years per region have at least 10 rec
-table8 <- ddply(table7,.(Region),nrow)
+table7 <- ddply(table6,.(OBJIDsic),nrow)
 
-#make a new table for the plot
-mf <- ddply(master_file,.(Location,locationID),nrow)
-names(mf)[3] <- "n_species"
+#eliminate duplicated rows in the checklists file (probably due to synonyms
+#in the original names that have been resolved)
 
-#include table 8 info in mf
-mf2 <- merge(mf,table8,by.x = "Location",by.y = "Region",
-             sort = F, all.x = T)
-mf2$V1[which(is.na(mf2$V1))] <- 0
+sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in data.table
+                        by = c("sps_reg"))
+
+#make a new table counting how many species have been registered in each region
+sps_per_reg <- ddply(sps_reg_list3,.(OBJIDsic,name),nrow)
+names(sps_per_reg)[3] <- "n_species"
+
+#include table7 info in sps_per_reg
+sps_per_reg2 <- merge(sps_per_reg,table7,
+                      by = "OBJIDsic",
+                      sort = F, all.x = T)
+
+sps_per_reg2$V1[which(is.na(sps_per_reg2$V1))] <- 0
 
 #calculate range dynamics evidence
-mf2$Rd <- mf2$V1/mf2$n_species*10
-mf2 <- mf2[,-4]
+sps_per_reg2$Rd <- sps_per_reg2$V1/sps_per_reg2$n_species*10
+sps_per_reg2 <- sps_per_reg2[,-4]
 
 #include Im in the table
 master_file$Im <- ifelse(master_file$IsInvasive == "Invasive",1,0)
