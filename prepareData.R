@@ -27,7 +27,7 @@ table2 <- merge(table,merge_tab,by="OBJIDsic",sort = F, all.x = T)
 
 #include region names and obj ID into the GloNAF table
 sps_reg_list2 <- merge(sps_reg_list,merge_tab,by="region_id",sort = F, all.x = T)
-  
+
 #create column with species and region info in the occurrence count table
 table2$sps_reg <- paste0(table2$species,"_",table2$OBJIDsic)
 
@@ -35,12 +35,47 @@ table2$sps_reg <- paste0(table2$species,"_",table2$OBJIDsic)
 sps_reg_list2$sps_reg <- paste0(sps_reg_list2$standardized_name,"_",
                                 sps_reg_list2$OBJIDsic)
 
+#eliminate duplicated rows in the checklists file (probably due to synonyms
+#in the original names that have been resolved)
+
+sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in data.table
+                        by = c("sps_reg"))
+
 #eliminate rows combining sps/reg that are not listed in the GloNAF table
 table3 <- table2[which(table2$sps_reg %in% sps_reg_list2$sps_reg),]
 
 #check which sps_region combination in the GloNAF table have at least one GBIF occurrence
-sps_reg_list2$confirmed <- as.numeric(sps_reg_list2$sps_reg %in% 
+sps_reg_list3$confirmed <- as.numeric(sps_reg_list3$sps_reg %in% 
                                       table3$sps_reg)
+
+#calculate the percentage of species per regions confirmed by GBIF
+
+perc_confirmed <- ddply(sps_reg_list3,.(name,OBJIDsic),summarise,
+              confirmed=mean(confirmed)*100,
+              n_sps=sum(OBJIDsic)/unique(OBJIDsic))
+
+#include the number of species, the percentage of species listed confirmed in 
+#the shapefile, and region names
+
+shp2 <- shp #create a copy of the shp
+shp2$confirmed <- rep(9999,nrow(shp2))  #include percentage of confirmed sps
+shp2$n_sps <- rep(9999,nrow(shp2))  #include n_species  
+shp2$region <- rep("XX",nrow(shp2))  #include region names  
+
+for(i in 1:nrow(shp2))
+{
+  a <- which(perc_confirmed$OBJIDsic == shp$OBJIDsic[i])
+  if(length(a) == 1)
+  {
+    shp2$confirmed[i] <- perc_confirmed$confirmed[a]  
+    shp2$n_sps[i] <- perc_confirmed$n_sps[a]  
+    shp2$region[i] <- perc_confirmed$name[a]
+  }else{
+    shp2$confirmed[i] <- NA 
+    shp2$n_sps[i] <- NA 
+    shp2$name[i] <- NA 
+  }
+}
 
 #check if there are enough records in the region to model the species occurrence
 #currently checking if there are 50 records in the region
@@ -80,12 +115,6 @@ table6 <- table5[-which(table5$n_5y < 10),]
 #count how many periods of five years per region have at least 10 rec
 table7 <- ddply(table6,.(OBJIDsic),nrow)
 
-#eliminate duplicated rows in the checklists file (probably due to synonyms
-#in the original names that have been resolved)
-
-sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in data.table
-                        by = c("sps_reg"))
-
 #make a new table counting how many species have been registered in each region
 sps_per_reg <- ddply(sps_reg_list3,.(OBJIDsic,name),nrow)
 names(sps_per_reg)[3] <- "n_species"
@@ -100,6 +129,16 @@ sps_per_reg2$V1[which(is.na(sps_per_reg2$V1))] <- 0
 #calculate range dynamics evidence
 sps_per_reg2$Rd <- sps_per_reg2$V1/sps_per_reg2$n_species*10
 sps_per_reg2 <- sps_per_reg2[,-4]
+
+
+###### NO, it has to go calculated into the shapefile !!!! bicha burra!
+#include range_dinamics info in main table
+
+merge_rd <- sps_per_reg2[,c(1,4)]
+sps_reg_list4 <- merge(sps_reg_list3,merge_rd,by = "OBJIDsic",
+                       sort = F, all.x = T)
+  
+sps_reg_list2$enough_recs
 
 #include Im in the table
 master_file$Im <- ifelse(master_file$IsInvasive == "Invasive",1,0)
