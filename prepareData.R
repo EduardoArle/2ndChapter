@@ -275,14 +275,14 @@ gradientLegend(valRange = c(0, 100),
 col_n_sps <- rep("xx",nrow(shp2)) 
 
 #create vector to populate with the transparency (use log scale)
-alpha_n_sps <- log(shp2$n_sps + 1)/max(log(shp2$n_sps + 1)) * 255
+alpha_n_sps <- log(shp2$n_sps)/max(log(shp2$n_sps)) * 255
 
 col_n_sps <- rgb(135,0,0,
               alpha=alpha_n_sps,
               maxColorValue = 255)
 
 plot(shp2,col=col_n_sps)
-plot(worldmapframe,add=F)
+plot(worldmapframe,add=T)
 
 
 col_leg <- colorRampPalette(c("white", rgb(135,0,0,
@@ -290,9 +290,16 @@ col_leg <- colorRampPalette(c("white", rgb(135,0,0,
                                            maxColorValue = 255)))
 
 # could not plot values the way I want (log) adapt the function
-gradientLegend(valRange = c(0, max(shp2$n_sps)), 
+myGradientLegend(valRange = c(1, max(shp2$n_sps)), 
                pos=c(0.3,-0.04,0.7,-0.075),
                color = col_leg(20), 
                side = 1,
-               n.seg = c(0,300,max(shp2$n_sps)),
-               labels = c("0","299",paste(max(shp2$n_sps))))
+               n.seg = c(1,max(shp2$n_sps)/4,max(shp2$n_sps)/2,
+                         max(shp2$n_sps)*3/4,max(shp2$n_sps)),
+               values = c("1",paste(round(exp(log(max(shp2$n_sps))/4))),
+                          paste(round(exp(log(max(shp2$n_sps))/2))),
+                          paste(round(exp(log(max(shp2$n_sps))*3/4))),
+                          paste(max(shp2$n_sps))))
+
+
+
