@@ -108,7 +108,7 @@ shp2$enough_recs <- rep(9999,nrow(shp2))  #include percentage of confirmed sps
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_enough_recs$Basin.Name == shp$BasinName)
+  a <- which(perc_enough_recs$Basin.Name == shp2$BasinName[i])
   if(length(a) == 1)
   {
     shp2$enough_recs[i] <- perc_enough_recs$enough_recs[a]  
@@ -202,9 +202,9 @@ col_confirmed[which(!is.na(shp2$confirmed))] <- rgb(40,40,148,
 
 col_confirmed[which(col_confirmed=="xx")] <- "white"
 
-plot(shp2,col=col_confirmed)
-plot(worldmapframe,add=T)
-
+plot(worldmapframe)
+plot(shp2,col=col_confirmed,add=T)
+plot(shp2[which(is.na(shp2$confirmed)),],add=T,density=150)
 
 col_leg <- colorRampPalette(c("white", rgb(40,40,148,
                                            alpha=255,
@@ -223,15 +223,17 @@ gradientLegend(valRange = c(0, 100),
 col_enough <- rep("xx",nrow(shp2)) 
 
 #create vector to populate with the transparency
-alpha_enough <- shp2$enough_recs * 2.55
+alpha_enough <- shp2$enough_recs[which(!is.na(shp2$enough_recs))] * 2.55
 
-col_enough <- rgb(191,144,0,
-                     alpha=alpha_enough,
-                     maxColorValue = 255)
+col_enough[which(!is.na(shp2$enough_recs))] <- rgb(191,144,0,
+                                          alpha=alpha_enough,
+                                          maxColorValue = 255)
 
-plot(shp2,col=col_enough)
-plot(worldmapframe,add=T)
+col_enough[which(col_enough=="xx")] <- "white"
 
+plot(worldmapframe)
+plot(shp2,col=col_enough,add=T)
+plot(shp2[which(is.na(shp2$enough_recs)),],add=T,density=150)
 
 col_leg <- colorRampPalette(c("white", rgb(191,144,0,
                                            alpha=255,
@@ -250,15 +252,17 @@ gradientLegend(valRange = c(0, 100),
 col_Rd <- rep("xx",nrow(shp2)) 
 
 #create vector to populate with the transparency
-alpha_Rd <- shp2$Rd * 2.55
+alpha_Rd <- shp2$Rd[which(!is.na(shp2$Rd))] * 2.55
 
-col_Rd <- rgb(56,87,35,
-                  alpha=alpha_Rd,
-                  maxColorValue = 255)
+col_Rd[which(!is.na(shp2$Rd))] <- rgb(56,87,35,
+                                  alpha=alpha_enough,
+                                  maxColorValue = 255)
 
-plot(shp2,col=col_Rd)
-plot(worldmapframe,add=T)
+col_Rd[which(col_Rd=="xx")] <- "white"
 
+plot(worldmapframe)
+plot(shp2,col=col_Rd,add=T)
+plot(shp2[which(is.na(shp2$Rd)),],add=T,density=150)
 
 col_leg <- colorRampPalette(c("white", rgb(56,87,35,
                                            alpha=255,
@@ -276,15 +280,18 @@ gradientLegend(valRange = c(0, 100),
 col_n_sps <- rep("xx",nrow(shp2)) 
 
 #create vector to populate with the transparency (use log scale)
-alpha_n_sps <- log(shp2$n_sps)/max(log(shp2$n_sps)) * 255
+alpha_n_sps <- log(shp2$n_sps[which(!is.na(shp2$n_sps))])/
+       max(log(shp2$n_sps[which(!is.na(shp2$n_sps))])) * 255
 
-col_n_sps <- rgb(135,0,0,
-              alpha=alpha_n_sps,
-              maxColorValue = 255)
+col_n_sps[which(!is.na(shp2$n_sps))] <- rgb(135,0,0,
+                                        alpha=alpha_n_sps,
+                                        maxColorValue = 255)
 
-plot(shp2,col=col_n_sps)
-plot(worldmapframe,add=T)
+col_n_sps[which(col_n_sps=="xx")] <- "white"
 
+plot(worldmapframe)
+plot(shp2,col=col_n_sps,add=T)
+plot(shp2[which(is.na(shp2$n_sps)),],add=T,density=150)
 
 col_leg <- colorRampPalette(c("white", rgb(135,0,0,
                                            alpha=255,
@@ -295,12 +302,12 @@ myGradientLegend(valRange = c(1, max(shp2$n_sps)),
                pos=c(0.3,-0.04,0.7,-0.075),
                color = col_leg(20), 
                side = 1,
-               n.seg = c(1,max(shp2$n_sps)/4,max(shp2$n_sps)/2,
-                         max(shp2$n_sps)*3/4,max(shp2$n_sps)),
-               values = c("1",paste(round(exp(log(max(shp2$n_sps))/4))),
-                          paste(round(exp(log(max(shp2$n_sps))/2))),
-                          paste(round(exp(log(max(shp2$n_sps))*3/4))),
-                          paste(max(shp2$n_sps))))
+               n.seg = c(1,max(shp2$n_sps,na.rm=T)/4,max(shp2$n_sps,na.rm=T)/2,
+                         max(shp2$n_sps,na.rm=T)*3/4,max(shp2$n_sps,na.rm=T)),
+               values = c("1",paste(round(exp(log(max(shp2$n_sps,na.rm=T))/4))),
+                          paste(round(exp(log(max(shp2$n_sps,na.rm=T))/2))),
+                          paste(round(exp(log(max(shp2$n_sps,na.rm=T))*3/4))),
+                          paste(max(shp2$n_sps,na.rm=T))))
 
 
 
