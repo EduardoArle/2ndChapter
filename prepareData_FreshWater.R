@@ -298,7 +298,7 @@ col_leg <- colorRampPalette(c("white", rgb(135,0,0,
                                            maxColorValue = 255)))
 
 # could not plot values the way I want (log) adapt the function
-myGradientLegend(valRange = c(1, max(shp2$n_sps)), 
+myGradientLegend(valRange = c(1, max(shp2$n_sps,na.rm=T)), 
                pos=c(0.3,-0.04,0.7,-0.075),
                color = col_leg(20), 
                side = 1,
@@ -308,6 +308,3 @@ myGradientLegend(valRange = c(1, max(shp2$n_sps)),
                           paste(round(exp(log(max(shp2$n_sps,na.rm=T))/2))),
                           paste(round(exp(log(max(shp2$n_sps,na.rm=T))*3/4))),
                           paste(max(shp2$n_sps,na.rm=T))))
-
-
-
