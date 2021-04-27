@@ -1,4 +1,4 @@
-library(raster);library(rgdal)
+library(raster);library(rgdal);library(rgeos)
 
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/ipbes_regions_subregions_shape_1.1"
 
@@ -57,7 +57,47 @@ ipbes$Meso_Region[which(ipbes$Sub_Region == "North Africa")] <-
 ipbes$Meso_Region[which(ipbes$Sub_Region == "Central Asia" )] <-
   "Asia"
 
-unique(ipbes$Meso_Region)
-ipbes$Sub_Region[which(is.na(ipbes$Meso_Region))]
+ipbes$Meso_Region[which(ipbes$Sub_Region == "South Asia" )] <-
+  "Asia"
 
-unique(ipbes$Sub_Region)
+ipbes$Meso_Region[which(ipbes$Sub_Region == "North-East Asia" )] <-
+  "Asia"
+
+ipbes$Meso_Region[which(ipbes$Sub_Region == "Southern Africa")] <-
+  "Africa"
+
+#simplify polygons
+ipbes2 <- gSimplify(ipbes,tol=0.1,topologyPreserve = T)
+
+#put data back making a spatialPolygonDataFrame
+ipbes3 <- SpatialPolygonsDataFrame(ipbes2,ipbes@data)
+
+#plot to check if it works and save the figure
+
+plot(ipbes3)
+     
+plot(ipbes3[which(ipbes3$Meso_Region == "North America"),],
+     col = "red", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Africa"),],
+     col = "gold", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "South America"),],
+     col = "darkgreen", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Central and Western Europe"),],
+     col = "blue", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Eastern Europe"),],
+     col = "orange", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Oceania"),],
+     col = "purple", add = T)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Asia"),],
+     col = "green", add = T)
+
+tail(t,10)
+
+
+unique(ipbes$Meso_Region)
