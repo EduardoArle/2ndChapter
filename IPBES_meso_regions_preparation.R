@@ -1,6 +1,7 @@
 library(raster);library(rgdal);library(rgeos)
 
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/ipbes_regions_subregions_shape_1.1"
+wd_out <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/ipbes_regions_mesoregions_shape"
 
 #load IPBES shapefie
 ipbes <- readOGR("IPBES_Regions_Subregions2",dsn=wd_IPBES)
@@ -72,6 +73,8 @@ ipbes2 <- gSimplify(ipbes,tol=0.1,topologyPreserve = T)
 #put data back making a spatialPolygonDataFrame
 ipbes3 <- SpatialPolygonsDataFrame(ipbes2,ipbes@data)
 
+ipbes3 <- ipbes
+
 #plot to check if it works and save the figure
 
 plot(ipbes3)
@@ -97,7 +100,20 @@ plot(ipbes3[which(ipbes3$Meso_Region == "Oceania"),],
 plot(ipbes3[which(ipbes3$Meso_Region == "Asia"),],
      col = "green", add = T)
 
-tail(t,10)
+#calculate area or each region
+ipbes3$Area_km2 <- NA
+
+for(i in 1:nrow(ipbes3))
+{
+  ipbes3$Area_km2[i] <- area(ipbes3[i,])/1000000
+  print(i)
+}
+
+#save new shapefile
+writeOGR(ipbes3, dsn = wd_out, driver = "ESRI Shapefile", 
+         layer = "IPBES_mesoregions")
+
+
 
 
 unique(ipbes$Meso_Region)
