@@ -35,9 +35,96 @@ table$Meso_region <- meso$Mes_Rgn
 
 setwd(wd_results)
 
-write.csv(table,"GloNAF_mesoRegion.csv")
+write.csv(table,"GloNAF_mesoRegion.csv",row.names = F)
 
 ############################ Scrap ##########################
+
+#visualisation for manual assessment of regions
+
+plot(world,col="grey80",border=NA)
+
+plot(region_centre[which(region_centre$OBJIDsic == 84),],add = T, col = "red",
+     pch = 19, cex = 0.5) #channel islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 91),],add = T, col = "red",
+     pch = 19, cex = 0.5) #cocos islands islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 130),],add = T, col = "red",
+     pch = 19, cex = 0.5) #española
+
+plot(region_centre[which(region_centre$OBJIDsic == 151),],add = T, col = "red",
+     pch = 19, cex = 0.5) #French Frigate Shoals
+
+plot(region_centre[which(region_centre$OBJIDsic == 158),],add = T, col = "darkgreen",
+     pch = 19, cex = 0.5) #Genovesa
+
+plot(region_centre[which(region_centre$OBJIDsic == 202),],add = T, col = "darkgreen",
+     pch = 19, cex = 0.5) #Isabela
+
+plot(region_centre[which(region_centre$OBJIDsic == 211),],add = T, col = "darkgreen",
+     pch = 19, cex = 0.5) #Juan Fernandez
+
+plot(region_centre[which(region_centre$OBJIDsic == 227),],add = T, col = "orange",
+     pch = 19, cex = 0.5) #Kermadec Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 804),],add = T, col = "green",
+     pch = 19, cex = 0.5) #cook islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 547),],add = T, col = "green",
+     pch = 19, cex = 0.5) #beacon island
+
+plot(region_centre[which(region_centre$OBJIDsic == 548),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Coral Sea Islands Territory
+
+plot(region_centre[which(region_centre$OBJIDsic == 552),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Helms Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 553),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Hummock Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 356),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Pearl & Hermes
+
+plot(region_centre[which(region_centre$OBJIDsic == 555),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Long Island, Houtman Abrolhos
+
+plot(region_centre[which(region_centre$OBJIDsic == 577),],add = T, col = "orange",
+     pch = 19, cex = 0.5) #Pigeon Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 608),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Seagull Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 619),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Esperance Plains
+
+plot(region_centre[which(region_centre$OBJIDsic == 651),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Bahamas
+
+plot(region_centre[which(region_centre$OBJIDsic == 671),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Trindade e Martim Vaz
+
+plot(region_centre[which(region_centre$OBJIDsic == 712),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Aisen
+
+plot(region_centre[which(region_centre$OBJIDsic == 728),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Capitán Prat
+
+plot(region_centre[which(region_centre$OBJIDsic == 760),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Última Esperanza
+
+plot(region_centre[which(region_centre$OBJIDsic == 816),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Comoros
+
+plot(region_centre[which(region_centre$OBJIDsic == 822),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Cayman Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 847),],add = T, col = "blue",
+     pch = 19, cex = 0.5) #Crozet Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 853),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Diego Garcia
+
+y <- over(region_centre[which(region_centre$OBJIDsic == 124),],ipbes)
 
 #identify the GloNAF regions that where not assessed to any IPBES region
 
