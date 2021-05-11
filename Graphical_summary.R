@@ -35,7 +35,7 @@ table$Meso_region <- meso$Mes_Rgn
 
 setwd(wd_results)
 
-write.csv(table,"GloNAF_mesoRegion.csv",row.names = F)
+write.csv(table,"GloNAF_mesoRegion_with_gaps.csv",row.names = F)
 
 ############################ Scrap ##########################
 
@@ -124,7 +124,58 @@ plot(region_centre[which(region_centre$OBJIDsic == 847),],add = T, col = "blue",
 plot(region_centre[which(region_centre$OBJIDsic == 853),],add = T, col = "green",
      pch = 19, cex = 0.5) #Diego Garcia
 
+plot(region_centre[which(region_centre$OBJIDsic == 874),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Gonave
+
+plot(region_centre[which(region_centre$OBJIDsic == 895),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Lakshadweep
+
+plot(region_centre[which(region_centre$OBJIDsic == 903),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Puducherry
+
+plot(region_centre[which(region_centre$OBJIDsic == 930),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Canton, Phoenix Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 936),],add = T, col = "orange",
+     pch = 19, cex = 0.5) #Tabueran
+
+plot(region_centre[which(region_centre$OBJIDsic == 987),],add = T, col = "orange",
+     pch = 19, cex = 0.5) #Ailinginae Atoll
+
+plot(region_centre[which(region_centre$OBJIDsic == 988),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Eniwetok, Mashall Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 1075),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Desertas
+
+plot(region_centre[which(region_centre$OBJIDsic == 1078),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Salvage Islands
+
+plot(region_centre[which(region_centre$OBJIDsic == 1260),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Tonga
+
+plot(region_centre[which(region_centre$OBJIDsic == 1284),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Johnston Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 1340),],add = T, col = "red",
+     pch = 19, cex = 0.5) #Marion Island
+
+plot(region_centre[which(region_centre$OBJIDsic == 1344),],add = T, col = "green",
+     pch = 19, cex = 0.5) #Prince Edward Island, South Africa
+
+plot(region_centre[which(region_centre$OBJIDsic == 1024),],add = T, col = "green",
+     pch = 19, cex = 0.5) #New Caledonia
+
+plot(region_centre[which(region_centre$OBJIDsic == 546),],add = T, col = "orange",
+     pch = 19, cex = 0.5) #Ashmore Reef
+
 y <- over(region_centre[which(region_centre$OBJIDsic == 124),],ipbes)
+
+setwd(wd_results)
+
+test <- read.csv("GloNAF_mesoRegion.csv")
+
+unique(is.na(test$Meso_region))
 
 #identify the GloNAF regions that where not assessed to any IPBES region
 
