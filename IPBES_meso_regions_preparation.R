@@ -77,28 +77,31 @@ ipbes3 <- ipbes
 
 #plot to check if it works and save the figure
 
-plot(ipbes3)
+plot(ipbes3, border=NA)
      
 plot(ipbes3[which(ipbes3$Meso_Region == "North America"),],
-     col = "red", add = T)
+     col = "red", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "Africa"),],
-     col = "gold", add = T)
+     col = "gold", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "South America"),],
-     col = "darkgreen", add = T)
+     col = "darkgreen", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "Central and Western Europe"),],
-     col = "blue", add = T)
+     col = "blue", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "Eastern Europe"),],
-     col = "orange", add = T)
+     col = "orange", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "Oceania"),],
-     col = "purple", add = T)
+     col = "purple", add = T, border = NA)
 
 plot(ipbes3[which(ipbes3$Meso_Region == "Asia"),],
-     col = "green", add = T)
+     col = "green", add = T, border = NA)
+
+plot(ipbes3[which(ipbes3$Meso_Region == "Antarctica"),],
+     col = "gray70", add = T, border = NA)
 
 #calculate area or each region
 ipbes3$Area_km2 <- NA

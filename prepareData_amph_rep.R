@@ -1,25 +1,36 @@
 library(rgdal);library(raster)
 
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
-wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants"
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
 
 #load shp
-shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp)
+shp <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
 
 #load table
 setwd(wd_table)
-table <- read.csv("Exotic Species Records.csv")
-
-#delete rows with native aliens
-table2 <- table[-which(table$Notes ==
-          "Native and exotic in the same bentity"),]
+table <- read.csv("Checklist_amphibians_reptiles.csv")
 
 #check if all regions listed in the table are represented
 #in the shapefile
-regs <- sort(unique(table2$bentity2))
+regs <- sort(unique(table$Region))
 shp_regs <- sort(unique(shp$BENTITY2_N))
 
 missing <- regs[-which(regs %in% shp_regs)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #create two tables, one with the regions represented
 #in the shapefile and the other with the unrepresented

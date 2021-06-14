@@ -97,8 +97,10 @@ myGradientLegend <- function (valRange, color = "terrain", nCol = 30, pos = 0.87
     im <- t(im)
     rasterImage(im, loc[1], loc[2], loc[3], loc[4], col = mycolors, 
                 xpd = T)
-    segments(x0 = ticks, x1 = ticks, y0 = rep(loc[2], n), 
-             y1 = rep(loc[4], n), col = tick.col, xpd = TRUE)
+    if(n.seg != 0){
+      segments(x0 = ticks, x1 = ticks, y0 = rep(loc[2], n), 
+               y1 = rep(loc[4], n), col = tick.col, xpd = TRUE)
+    }
     rect(loc[1], loc[2], loc[3], loc[4], border = border.col, 
          xpd = T)
   }
@@ -106,8 +108,10 @@ myGradientLegend <- function (valRange, color = "terrain", nCol = 30, pos = 0.87
     im <- rev(im)
     rasterImage(im, loc[1], loc[2], loc[3], loc[4], col = mycolors, 
                 xpd = T)
-    segments(x0 = rep(loc[1], n), x1 = rep(loc[3], n), y0 = ticks, 
-             y1 = ticks, col = tick.col, xpd = TRUE)
+    if(n.seg != 0){
+      segments(x0 = rep(loc[1], n), x1 = rep(loc[3], n), y0 = ticks, 
+               y1 = ticks, col = tick.col, xpd = TRUE)
+    }
     rect(loc[1], loc[2], loc[3], loc[4], border = border.col, 
          xpd = T)
   }

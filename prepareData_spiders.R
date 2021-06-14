@@ -1,14 +1,38 @@
 library(rgdal);library(raster)
 
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
-wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Spiders"
+
+#load table
+setwd(wd_table)
+table <- read.csv("alien spiders Wolfgang Nentwig.csv")
+
+table$binomial <- paste0(table$genus," ",table$species)
+
+n_sps <- length(unique(table$binomial))
+
+names(table)
+
+table2 <- table[,-c(20:31)]
+
+table3 <- table2[,c(20,6,9,11,13,15)]
+
+table4 <- table3[sample(c(1:nrow(table3)),10),]
+
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Spiders/Examples")
+write.csv(table4,"Examplary_data.csv")
+
+?sample
+
+table2[,5]
+
+names(table2)
 
 #load shp
 shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp)
 
-#load table
-setwd(wd_table)
-table <- read.csv("Exotic Species Records.csv")
+
+
+
 
 #delete rows with native aliens
 table2 <- table[-which(table$Notes ==
