@@ -7,53 +7,34 @@ wd_species <- "C:/Users/ca13kute/Documents/3rd_Chapter/Amphibians"
 #read species table
 setwd(wd_species)
 list <- read.csv("Amphibia_species_list.csv")
-list <- list[,1]
+list <- sort(list[,1])
 
 #make list of GBIF resolved names
 gbifDarwinCore <- character()
-
-t <- numeric()
+all_names <- character()
 
 for(i in 1:length(list))
 {
-  match <- resolve(list[i],db = "gnr")
-  match2 <- as.data.frame(match[[1]])
-  match3 <- match2[which(match2$data_source_title == "GBIF Backbone Taxonomy"),]
-  t[i] <- nrow(match3)
-  if(nrow(match3) == 0){
+  match <- get_ids_(list[i], db = 'gbif',rows=1:10)
+  match2 <- match[[1]][[1]]
+  match3 <- match2[which(match2$matchtype == "EXACT"),]
+  
+  if(nrow(match2) == 0){
     gbifDarwinCore[i] <- "not matched"
+  }
+  if(!"species" %in% names(match2)){
+    gbifDarwinCore[i] <- "not to species level"
   }else{
-    gbifDarwinCore[i] <- match3$matched_name
+    gbifDarwinCore[i] <- unique(match3$species)[1]
+  }
+  if(length(unique(match3$species)) == 1){
+    all_names[i] <- NA
+  }else{
+    all_names[i] <- paste(unique(match3$species),collapse = " / ")
   }
   print(i)
 }
 
-resolve(list[73],db = "gnr")
 
-comp <- data.frame(original=list,resolved=gbifDarwinCore)
-
-
-as.data.frame(resolve("Pelophylax kl. grafi",db = "gnr")[[1]])
-
-
-setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/0309231-200613084148143")
-
-tab <- read.csv("0309231-200613084148143.csv",sep="\t",encoding = "UTF-8")
-
-grep("Pelophylax kl. grafi",tab$scientificName)
-
-unique(tab$scientificName)
-
-head(tab)
-nrow(tab)
-
-list[which(t == 0)]
-
-which(t == 0)
-which(t == 1)
-which(t > 1)
-
-length(t)
-t[[1]]$data_source_title
-
-class(t[[1]])
+table <- data.frame(entry = list,gbifDarwinCore = gbifDarwinCore,
+           otherNames = all_names)
