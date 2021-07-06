@@ -38,3 +38,7 @@ for(i in 1:length(list))
 
 table <- data.frame(entry = list,gbifDarwinCore = gbifDarwinCore,
            otherNames = all_names)
+
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians")
+
+write.csv(table,"Amphibia_aliens_harmonised.csv",row.names = F)
