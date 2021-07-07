@@ -1,5 +1,10 @@
 library(rgdal);library(raster)
 
+##### USED the mammals range maps to produce checklists by overlay to the
+# ants shapefile
+
+############## MAMMALS USE THE SAME SHAPEFILE AS ANTS ################
+
 wd_mapping <- "C:/Users/ca13kute/Documents/Soup/World_simple_map"
 
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals/DAMA"

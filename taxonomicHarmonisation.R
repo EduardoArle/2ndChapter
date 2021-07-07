@@ -1,13 +1,31 @@
 #load libraries
 library(taxize)
 
-#set paths
-wd_species <- "C:/Users/ca13kute/Documents/3rd_Chapter/Amphibians"
+#################### Amphibians ##################
 
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/3rd_Chapter/Amphibians"
 #read species table
 setwd(wd_species)
 list <- read.csv("Amphibia_species_list.csv")
 list <- sort(list[,1])
+
+#################### Mammals #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals"
+
+#read species table
+setwd(wd_species)
+list <- read.csv("Alien_mammal_checklist.csv")
+list <- sort(unique(list[,2]))
+
+
+
+
+
+###################### HARMONISATION ######################
+
+
 
 #make list of GBIF resolved names
 gbifDarwinCore <- character()
@@ -24,6 +42,7 @@ for(i in 1:length(list))
   }
   if(!"species" %in% names(match2)){
     gbifDarwinCore[i] <- "not to species level"
+    all_names[i] <- NA
   }else{
     gbifDarwinCore[i] <- unique(match3$species)[1]
   }
@@ -39,6 +58,13 @@ for(i in 1:length(list))
 table <- data.frame(entry = list,gbifDarwinCore = gbifDarwinCore,
            otherNames = all_names)
 
-setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians")
+changed_names <- table[table$entry != table$gbifDarwinCore,]
 
-write.csv(table,"Amphibia_aliens_harmonised.csv",row.names = F)
+other_names <- table[!is.na(table$otherNames),]
+
+
+#### save mammals
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Mammals")
+
+write.csv(table,"Mammalia_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
