@@ -16,4 +16,4 @@ table3 <- unique(as.data.table(table2),
 #count observations per species per year per region
 table4 <- ddply(table3,.(species,year,BENTITY2_N), nrow)
 
-saveRDS(table2,"Amphibia_occurrence_region_count")
+saveRDS(table4,"Amphibia_occurrence_region_count")

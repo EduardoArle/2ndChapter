@@ -4,8 +4,10 @@ library(rgdal);library(raster);library(maptools);library(rgeos)
 #list wds
 wd_shp_ants <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
 wd_GRIIS_shp <- "C:/Users/ca13kute/Documents/sTWIST/GRIIS_shp" 
-wd_zaf <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/ZAF_adm"
-wd_specific_issues <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Specific_shp_issues"
+wd_antilles <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/ANT_adm"
+wd_shp_amph <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
+wd_shp_india <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/IND_adm"
+wd_specific_issues <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/Specific_shp_issues"
 wd_data_GAVIA <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA"
 
 #load ants shp
@@ -14,8 +16,11 @@ shp_ants <- readOGR("Bentity2_shapefile_fullres", dsn = wd_shp_ants)
 #load GRIIS shp
 shp_griis <- readOGR("GRIIS_ISO3", dsn = wd_GRIIS_shp)
 
-#load South African shapefile
-shp_zaf <- readOGR("ZAF_adm1", dsn = wd_zaf)
+#load amphibian shapefile
+shp_amph <- readOGR("Regions_reptiles_amphibians", dsn = wd_shp_amph)
+
+#load shp India
+shp_india <- readOGR("IND_adm1", dsn = wd_shp_india)
 
 #list regions in the table 
 tab_regs <- sort(unique(table$Region))
@@ -26,8 +31,11 @@ ant_regs <- sort(unique(shp_ants$BENTITY2_N))
 #list regions in the griis shapefile
 griis_regs <- sort(unique(shp_griis$Region))
 
-#list south african regions
-zaf_regs <- sort(unique(shp_zaf$NAME_1))
+#list amphibian regions
+amph_regs <- sort(unique(shp_amph$BENTITY2_N))
+
+#list indian regions
+india_regs <- sort(unique(shp_india$NAME_1))
 
 
 
@@ -44,6 +52,12 @@ table2 <- table[which(table$StatusCat == "Established" |
 
 countries <- sort(unique(table2$CountryName))
 
+
+#### create new column in the checklist table to include the region names
+
+table2$GAVIARegion <- NA
+
+
 #manually compile the shp solving case by case
 
 i=1 #### entries with just location description 
@@ -55,202 +69,60 @@ count_tab <- table2[which(table2$CountryName == countries[i]),]
 
 count_tab$LocationDescription
 
-i=2
+i=2 
 
 countries[i]
 
 count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab
+
+reg_i <- shp_ants[which(toupper(shp_ants$BENTITY2_N) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
 
+a$GAVIARegion = countries[i]
 
-##################### SCRAP #######################
+a <- spChFIDs(a,paste(i))
 
+shp_birds <- a
 
-#manually compile the shp solving case by case
+plot(shp_birds)
 
-i=1
+#include region name in the checklist
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-reg_i
-plot(reg_i)
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-shp_rep_amph <- spChFIDs(reg_i,paste(i))
-
-i=2
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=3
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-shp_rep_amph 
-
-
-i=4
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=5
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=6 ##### DECISION only one species listed, also listed as alien in 
-########## Seychelles. Other regions (islands) of the coutry not individually
-########## listed. So I disregarded this entry
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs  #### Aldabra (Seychelles)
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[which(table$Region == "Seychelles"),]
-table[which(table$Region == "Mahé"),]
-table[which(table$Region == "Cosmoledo"),]
-table[which(table$Region == "Farquhar"),]
-
-table2 <- table[-which(table$Region == tab_regs[i]),]
-
-
-i=7
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=8  #### region taken from GRIIS shapefile, attribute table must be modified
+i=3 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% griis_regs
+grep("land Islands",griis_regs)
+griis_regs[c(1,80)]
+
+reg_i <- shp_griis[which(shp_griis$Region == "Ã…land Islands"),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -260,74 +132,329 @@ plot(reg_i,add=T,col="red",border=NA)
 ### modify attribute table
 
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-                                #into SpatialPolygon
+#into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in shapefile
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=9
+i=4
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+reg_i <- shp_ants[which(toupper(shp_ants$BENTITY2_N) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=10
+i=5 #Algeria, few entries with region detail, decision to aggregate to 
+#country level
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+reg_i <- shp_ants[which(toupper(shp_ants$BENTITY2_N) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+
+i=6 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=7
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+reg_i <- shp_ants[which(toupper(shp_ants$BENTITY2_N) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds 
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=8 
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+reg_i <- shp_ants[which(toupper(shp_ants$BENTITY2_N) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds 
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=9  #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep(countries[i],toupper(griis_regs))
+grep("ANGUILLA",toupper(griis_regs))
+
+reg_i <- shp_griis[grep("ANGUILLA",toupper(shp_griis$Region)),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=10  #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=11 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+##############  DECISION to join Antigua and Barbuda in one region,
+#some species did not carry info on what island they were
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -339,28 +466,42 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=12 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+##############  DECISION to consider Argentina as one region,
+#some species did not carry info on what province they were
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -372,28 +513,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=13 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -405,154 +557,523 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=14 ##### DECISION three species listed, also listed as alien in 
-########## the province of Buenos Aires. So I disregarded this entry
-########### for Argentina Distrito Federal
+i=14 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs  #### Aldabra (Seychelles)
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[which(table$Region == "Buenos Aires"),]
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
 
+#make shapefile
 
-table3 <- table2[-which(table2$Region == tab_regs[i]),]
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=15
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+##############  DECISION to consider each Australian province as one region,
+#very few species will be lost
+
+aus <- sort(unique(count_tab$AreaName1))
+
+j=1  #entries with empty province info solve later
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+j=2 ### decision to include "Australian Capital Territory" in "New South Wales"
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                  table2$AreaName1 == aus[j])] <- toupper("New South Wales")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=3
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
 
 
-i=16
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+j=4
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
 
 
-i=17
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+j=5
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=6
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=7
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=8
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == aus[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=9
+
+aus[j]
+
+aus_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == aus[j]),]
+
+aus_tab
+
+aus[j] %in% amph_regs
+
+reg_i <- shp_amph[which(shp_amph$BENTITY2_N == aus[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(aus[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == aus[j])] <- toupper(aus[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=16 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=17 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=18 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i
-plot(reg_i)
+count_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+countries[i] %in% toupper(griis_regs)
 
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=19 #### both ants and griis shapes clump Ascension, St Helena, and Tristas
-    ##### da Cunha together. Separated shapefile needed
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-feature <- shp_ants[grep(tab_regs[i],shp_ants$BENTITY2_N),]
-cropped <- crop(feature,extent(-14.5, -14.25, -8, -7.8))
-
-plot(cropped)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[grep("Helena",table$Region),]
-table[grep("Tristan",table$Region),]
-
-
-reg_i <- cropped
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
@@ -567,342 +1088,344 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=20 #### no aliens listed, so just ignored
+i=19 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-table4 <- table3[-which(table3$Region == tab_regs[i]),]
+count_tab
 
+countries[i] %in% toupper(griis_regs)
 
-i=21
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=22
+i=20 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=23
+i=21 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=24
+i=22 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=25
+i=23 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=24 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=25 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=26 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i
-plot(reg_i)
+count_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+countries[i] %in% toupper(griis_regs)
 
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=27
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=28
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=29
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=30
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=31
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=32
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=33
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=34 #### griis shape clumps Bonaire Sint Eustatius, and Saba together.   
-    ####Separated shapefile needed
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-feature <- shp_griis[grep(tab_regs[i],shp_griis$Region),]
-cropped <- crop(feature,extent(-68.5, -68, 11.9, 12.4))
-
-plot(cropped)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[grep("Sint",table$Region),]
-table[grep("Saba",table$Region),]
-
-reg_i <- cropped
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
@@ -917,77 +1440,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=35  #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Bosnia",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Bosnia",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=36  #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Bouvet",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Bouvet",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=37  #### region taken from GRIIS shapefile, attribute table must be modified
+i=27 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -999,51 +1484,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=38
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=39  #### region taken from GRIIS shapefile, attribute table must be modified
+i=28 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[grep("Virgin",shp_griis$Region),]
-reg_i <- reg_i[1,]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -1055,339 +1528,1447 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=40
+i=29 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=41
+i=30 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=42
+i=31 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+##############  DECISION to consider Brazil as one region,
+#most species did not carry info on what province they were
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=43
+i=32 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=44
+i=33 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+toupper(griis_regs)[grep("VIRGIN",toupper(griis_regs))]
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == "VIRGIN ISLANDS (BRITISH)"),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=45
+i=34 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=46 #just a name issue
+i=35 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Verde",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Verde",shp_ants$BENTITY2_N),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=47
+i=36 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=48
+i=37 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=49
+i=38 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=50
+i=39
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+##############  DECISION to consider each Canadian province as one region,
+# few species will be lost
+
+can <- sort(unique(count_tab$AreaName1))
+
+j=1  #entries with empty province info solve later
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+j=2
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == can[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
 
 
-i=51
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+j=3
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == can[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
 
 
-i=52
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+j=4
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+grep("Newfoundland",ant_regs)
+
+reg_i <- shp_ants[grep("Newfoundland",shp_ants$BENTITY2_N),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
 
 
-i=53
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+j=5
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == can[j]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=6
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == can[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=7
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+grep("Quebec",ant_regs)
+
+reg_i <- shp_ants[grep("Quebec",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=8
+
+can[j]
+
+can_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == can[j]),]
+
+can_tab
+
+can[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == can[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(can[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == can[j])] <- toupper(can[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=40 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=41 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=42 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=43 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=44 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+##############  DECISION to consider China as one region,
+#some species did not carry info on what province they were
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=45 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=46 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("COCOS",toupper(griis_regs))
+
+reg_i <- shp_griis[grep("COCOS",toupper(shp_griis$Region)),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=47 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=48 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=49 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+griis_regs[grep("CONGO",toupper(griis_regs))]
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == "CONGO"),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=50 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+countries[i] %in% toupper(griis_regs)
+griis_regs[grep("CONGO",toupper(griis_regs))]
+
+reg_i <- shp_griis[which(shp_griis$Region =="Democratic Republic of the Congo"),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=51 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=52 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=53 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("IVOIRE",toupper(griis_regs))
+
+
+reg_i <- shp_griis[grep("IVOIRE",toupper(shp_griis$Region)),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=54 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -1399,29 +2980,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=55 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -1433,387 +3024,745 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=56
+i=56 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=57
+i=57 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=58
+i=58 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=59
+i=59 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=60 #just a name issue
+i=60 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Cocos",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Cocos",shp_ants$BENTITY2_N),]
-reg_i <- reg_i[1,]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=61
+i=61 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=62
+i=62 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=63
+i=63 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=64
+i=64 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=65
+i=65 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=66
+i=66 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=67 #just a name issue
+i=67 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Cordoba",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Cordoba",shp_ants$BENTITY2_N),]
-reg_i <- reg_i[2,]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=68
+i=68 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=69
+i=69 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("FALK",toupper(griis_regs))
+
+reg_i <- shp_griis[grep("FALK",toupper(shp_griis$Region)),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=70
+i=70 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=71
+i=71 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("FIJI",toupper(griis_regs))
+
+reg_i <- shp_griis[grep("FIJI",toupper(shp_griis$Region)),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=72 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -1825,172 +3774,347 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=73
+i=73 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=74
+i=74 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=75
+i=75 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=76
+i=76 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=77  #### no aliens listed, so just ignored
+i=77 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-table5 <- table4[-which(table4$Region == tab_regs[i]),]
+count_tab
 
+countries[i] %in% toupper(griis_regs)
 
-i=78
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=79
+i=78 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=79 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=80 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2002,28 +4126,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=81  #### region taken from GRIIS shapefile, attribute table must be modified
+i=81 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2035,50 +4170,83 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=82
+i=82 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=83 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[grep("Timor",shp_griis$Region),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2090,51 +4258,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=84
+i=84 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i
-plot(reg_i)
+count_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+countries[i] %in% toupper(griis_regs)
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=85  #### south African province AND name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-grep("Eastern Cape",zaf_regs)
-
-reg_i <- shp_zaf[grep("Eastern Cape",shp_zaf$NAME_1),]
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2146,390 +4302,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=86
+i=85 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i
-plot(reg_i)
+count_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+countries[i] %in% toupper(griis_regs)
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=87 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Galapagos",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Galapagos",shp_ants$BENTITY2_N),]
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=88
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=89
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=90 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Entre R",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Entre R",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=91
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=92
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=93
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=94  #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Falkland",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Falkland",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=95 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Faroe",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Faroe",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=96
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=97
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=98
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=99
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=100
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=101 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Corsica",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Corsica",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=102 #### south African province 
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-
-reg_i <- shp_zaf[which(shp_zaf$NAME_1 == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2541,94 +4346,39 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=103
+i=86 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-reg_i
-plot(reg_i)
+count_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+countries[i] %in% toupper(griis_regs)
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=104
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=105
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=106 #### south African province 
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-
-reg_i <- shp_zaf[which(shp_zaf$NAME_1 == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2640,74 +4390,1909 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=107 #just a name issue
+i=87 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Georgia US",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Georgia US",shp_ants$BENTITY2_N),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=108
+i=88 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=89 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=90 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=91 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=92 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("HONG",toupper(griis_regs))
+
+
+reg_i <- shp_griis[grep("HONG",toupper(shp_griis$Region)),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=93 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=94 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=95
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+##############  DECISION to consider each Indian province as one region,
+#very few species will be lost
+
+ind <- sort(unique(count_tab$AreaName1))
+
+j=1  #entries with empty province info solve later
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+j=2 
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Andaman",india_regs)
+
+reg_i <- shp_india[grep("Andaman",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=3 
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Andhra",india_regs)
+
+reg_i <- shp_india[grep("Andhra",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=4
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+
+reg_i <- shp_india[which(shp_india$NAME_1 == ind[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=5
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Lakshadweep",india_regs)
+
+reg_i <- shp_india[grep("Lakshadweep",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=6
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Maharashtra",india_regs)
+
+reg_i <- shp_india[grep("Maharashtra",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=7
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Tamil",india_regs)
+
+reg_i <- shp_india[grep("Tamil",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=8
+
+ind[j]
+
+ind_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ind[j]),]
+
+ind_tab
+
+ind[j] %in% india_regs
+grep("Bengal",india_regs)
+
+reg_i <- shp_india[grep("Bengal",shp_india$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(ind[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ind[j])] <- toupper(ind[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=96 #### region prepared manually from Indonesia DIVA GIS regions
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+##############  DECISION to consider each Indonesian island or archipelago 
+#as one region,
+#very few species will be lost
+
+indo <- sort(unique(count_tab$AreaName1))
+
+j=1  #entries with empty province info solve later
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+j=2 
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper("Sumatra")
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=3 
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+#verify if feature is already in the shapefile
+
+toupper("Sumatra") %in% shp_birds$GAVIARegion
+
+#if not
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=4
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+#verify if feature is already in the shapefile
+
+toupper("Sumatra") %in% shp_birds$GAVIARegion
+
+#if not
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=5
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+#prepare region manually
+
+reg_i <- readOGR("Lesser Sunda Islands (IDN)",dsn = wd_specific_issues)
+
+#if not
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+a <- reg_i
+names(a) <- "GAVIARegion"
+
+#make shapefile
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Lesser Sunda Islands (IDN)")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=6
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+#prepare region manually
+
+reg_i <- readOGR("New Guinea (IDN)",dsn = wd_specific_issues)
+
+#if not
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+a <- reg_i
+names(a) <- "GAVIARegion"
+
+#make shapefile
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("New Guinea (IDN)")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=7
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+#verify if feature is already in the shapefile
+
+toupper("Sumatra") %in% shp_birds$GAVIARegion
+
+#if yes
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=8
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == indo[j]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = toupper(indo[j])
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper(indo[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=9
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+#prepare region manually
+
+reg_i <- readOGR("Kalimantan",dsn = wd_specific_issues)
+
+#if not
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+a <- reg_i
+names(a) <- "GAVIARegion"
+
+#make shapefile
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper(indo[j])
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=10
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+#prepare region manually
+
+reg_i <- readOGR("Maluku",dsn = wd_specific_issues)
+
+#if not
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+a <- reg_i
+names(a) <- "GAVIARegion"
+
+#make shapefile
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper(indo[j])
+
+
+j=11
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+reg_i <- readOGR("Lesser Sunda Islands (IDN)",dsn = wd_specific_issues)
+
+#verify if feature is already in the shapefile
+
+toupper("Lesser Sunda Islands (IDN)") %in% shp_birds$GAVIARegion
+
+#if yes
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Lesser Sunda Islands (IDN)")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=12
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+reg_i <- readOGR("Lesser Sunda Islands (IDN)",dsn = wd_specific_issues)
+
+#verify if feature is already in the shapefile
+
+toupper("Lesser Sunda Islands (IDN)") %in% shp_birds$GAVIARegion
+
+#if yes
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Lesser Sunda Islands (IDN)")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=13
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+#verify if feature is already in the shapefile
+
+toupper("Sumatra") %in% shp_birds$GAVIARegion
+
+#if yes
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=14 #Sabah is in Malaysia! Ignore the one sps entry (Passer montanus,
+#also listed in Sabah as Malaysia).
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+
+j=15  #Sarawak is in Malaysia! Ignore the one entry (Acridotheres tristis,
+#NOT included in Sarawak as Malaysia).
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+
+j=16
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+#prepare region manually
+
+reg_i <- readOGR("Sulawesi",dsn = wd_specific_issues)
+
+#if not
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+a <- reg_i
+names(a) <- "GAVIARegion"
+
+#make shapefile
+
+a <- spChFIDs(a,paste0(i,"_",j))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper(indo[j])
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=17
+
+indo[j]
+
+indo_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j]),]
+
+indo_tab
+
+indo[j] %in% ant_regs
+grep("Sumatra",ant_regs)
+
+reg_i <- shp_ants[grep("Sumatra",shp_ants$BENTITY2_N),]
+
+#verify if feature is already in the shapefile
+
+toupper("Sumatra") %in% shp_birds$GAVIARegion
+
+#if yes
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == indo[j])] <- toupper("Sumatra")
+
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=97 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=98  #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=99 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=100 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=101 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+##############  Decision to consider Sicily and Sardinia as individua entries
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+#make sure to separate Sicily and Sardinia data
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                    table2$AreaName1 != "Sicily" &
+                    table2$AreaName1 != "Sardinia")] <- countries[i]
+ 
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+reg_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == "Sicily"),]
+
+reg_tab
+
+"Sicily" %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == "Sicily"),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = "SICILY"
+
+a <- spChFIDs(a,paste0(i,"_1"))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+#make sure to separate Sicily and Sardinia data
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == "Sicily")] <- "SICILY"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+reg_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == "Sardinia"),]
+
+reg_tab
+
+"Sardinia" %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == "Sardinia"),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = "SARDINIA"
+
+a <- spChFIDs(a,paste0(i,"_2"))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+#make sure to separate Sicily and Sardinia data
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == "Sardinia")] <- "SARDINIA"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=102  #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+length(unique(count_tab$Binomial))
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=103 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+##############  DECISION to consider Japan as one region,
+#many species did not carry info on what island they were
+
+countries[i]
+
+length(unique(count_tab$Binomial))
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=104 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+length(unique(count_tab$Binomial))
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=105 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=106 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=107 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=108 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=109 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2719,28 +6304,41 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=110 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2752,50 +6350,87 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=111
+i=111 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=112 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2807,50 +6442,133 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=113 #### no aliens listed, so just ignored
+i=113 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-table6 <- table5[-which(table5$Region == tab_regs[i]),]
+count_tab
 
-i=114 #### no aliens listed, so just ignored
+countries[i] %in% toupper(griis_regs)
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+reg_i
+plot(reg_i)
 
-table7 <- table6[-which(table6$Region == tab_regs[i]),]
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=114 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
 
 i=115 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[grep("Guad",shp_griis$Region),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2862,28 +6580,41 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=116 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -2895,160 +6626,319 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=117
+i=117 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("Libya",griis_regs)
+
+reg_i <- shp_griis[grep("Libya",shp_griis$Region),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=118
+i=118 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=119
+i=119 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=120
+i=120 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=121
+i=121 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=122
+i=122 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+grep("Macedonia",griis_regs)
+
+reg_i <- shp_griis[grep("Macedonia",shp_griis$Region),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=123 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -3060,272 +6950,859 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=124
+i=124 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=125 #just a name issue
+i=125 #### region prepared manually from Indonesia DIVA GIS regions
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("McDo",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("McDo",shp_ants$BENTITY2_N),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+##############  DECISION to consider each Malaysian island or archipelago 
+#as one region,
+#very few species will be lost
+
+mal <- sort(unique(count_tab$AreaName1))
+
+#prepare region manually
+
+shp_mal <- readOGR("Malaysia",dsn = wd_specific_issues)
+names(shp_mal) <- "GAVIARegion"
+
+j=1  #entries with empty province info solve later
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+j=2  #Java is in Indonesia! Ignore the one sps entry (Passer dosmesticus,
+#NOT listed in Java as Indonesia).
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+j=3 
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA" %in% shp_birds$GAVIARegion
+
+#if not
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+shp_birds <- spRbind(shp_birds,reg_i)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=126
+j=4
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+mal[j]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=5
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=6
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=7
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=8
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=9
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=10
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("BORNEO",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"BORNEO (MYS)" %in% shp_birds$GAVIARegion
+
+#if not
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+shp_birds <- spRbind(shp_birds,reg_i)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "BORNEO (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=127
+j=11
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+mal[j]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("BORNEO",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"BORNEO (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "BORNEO (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+j=12
+
+mal[j]
+
+mal_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == mal[j]),]
+
+mal_tab
+
+
+reg_i <- shp_mal[grep("PENINSULA",shp_mal$GAVIARegion),]
+
+#verify if feature is already in the shapefile
+
+"PENINSULA (MYS)" %in% shp_birds$GAVIARegion
+
+#if yes
+
+#plot(shp_birds)
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])] <- "PENINSULA (MYS)"
+
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == mal[j])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=126 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=128
+i=127 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=129
+i=128 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=130
+i=129 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=131
+i=130 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=132
+i=131 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=133
+i=132 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=134
+i=133 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
+
+
+i=134 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+countries[i]
+
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=135 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -3337,116 +7814,225 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=136
+i=136 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=137
+i=137 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=138
+i=138 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=139
+i=139 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=140 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -3458,164 +8044,317 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=141
+i=141 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=142 #just a name issue
+i=142 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Sard",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Sard",shp_ants$BENTITY2_N),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=143 #just a name issue
+i=143 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Sici",shp_ants$BENTITY2_N),]
+countries[i]
 
-reg_i <- shp_ants[grep("Sici",shp_ants$BENTITY2_N),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=144
+i=144 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=145
+i=145 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=146
+i=146 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+countries[i]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
 
 #make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$GAVIARegion = countries[i]
+
+a <- spChFIDs(a,paste(i))
+
+shp_birds <- spRbind(shp_birds,a)
+
+shp_birds$GAVIARegion
+
+#plot(shp_birds)
+
+#include region name in the checklist
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
+
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
+
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
 i=147 #### region taken from GRIIS shapefile, attribute table must be modified
 ########## to include the feature in the shp
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
+countries[i]
 
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
+count_tab <- table2[which(table2$CountryName == countries[i]),]
+
+count_tab
+
+countries[i] %in% toupper(griis_regs)
+
+reg_i <- shp_griis[which(toupper(shp_griis$Region) == countries[i]),]
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -3627,2626 +8366,74 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = countries[i]
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
 
+shp_birds$GAVIARegion
 
-i=148
+#plot(shp_birds)
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+#include region name in the checklist
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+table2$GAVIARegion[which(table2$CountryName == countries[i])] <-
+  countries[i]
 
-reg_i
-plot(reg_i)
+table2$GAVIARegion[which(table2$CountryName == countries[i])]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
 
-#make shapefile
+i=148 #### region for Netherlands Antilles from DIVA GIS regions
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+countries[i]
 
+count_tab <- table2[which(table2$CountryName == countries[i]),]
 
-i=149 #just a name issue
+count_tab
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Juan F",shp_ants$BENTITY2_N),]
+countries[i] %in% toupper(griis_regs)
 
-reg_i <- shp_ants[grep("Juan F",shp_ants$BENTITY2_N),]
+##############  DECISION to consider each Netherlands Antilles island  
+#as one region,
+# few species will be lost
 
-reg_i
-plot(reg_i)
+ant <- sort(unique(count_tab$AreaName1))
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+#prepare region manually
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+shp_ant <- readOGR("ANT_adm1",dsn = wd_antilles)
 
-#make shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+j=1  #entries with empty province info solve later
 
+ant[j]
 
-i=150
+ant_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ant[j]),]
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+ant_tab
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
 
-reg_i
-plot(reg_i)
+j=2
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+ant[j]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+ant_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ant[j]),]
 
-#make shapefile
+ant_tab
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
 
+reg_i <- shp_ant[grep("Bonaire",shp_ant$NAME_1),]
 
-i=151
+#verify if feature is already in the shapefile
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+toupper(ant[j]) %in% shp_birds$GAVIARegion
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=152
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=153
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=154
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=155
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=156 #### no aliens listed, so just ignored
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-table8 <- table7[-which(table7$Region == tab_regs[i]),]
-
-
-i=157
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=158 #### south African province 
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-
-reg_i <- shp_zaf[which(shp_zaf$NAME_1 == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=159
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=160
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=161 #### the data base separated Newfoundland from Labrador, make shapes
-     ##### representing it
-
-reg_i <- readOGR("Labrador",dsn=wd_specific_issues)
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=162
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=163
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=164
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=165
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=166
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=167
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=168 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Lord",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Lord",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=169
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=170
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=171
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=172
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=173
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=174
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=175  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=176 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Maldive",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Maldive",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=177
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=178
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=179 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Marsh",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Marsh",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=180  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=181
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=182
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=183
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=184 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=185 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=186
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=187 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Federal Mex",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Federal Mex",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=188 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Federal Mex",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == "Mexico"),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=189
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=190 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Micho",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Micho",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=191 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Micro",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Micro",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=192
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=193
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=194
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=195
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=196
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=197 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=198
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=199
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=200 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=201
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=202
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=203
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=204 #### south African province 
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-
-reg_i <- shp_zaf[which(shp_zaf$NAME_1 == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=205
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=206
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=207
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=208
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=209
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=210 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Nether",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Nether",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=211 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Neuq",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Neuq",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=212
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=213
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=214
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=215
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=216
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=217
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=218
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=219
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=220
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=221  #### the data base separated Newfoundland from Labrador, make shapes
-##### representing it
-
-reg_i <- readOGR("Newfoundland",dsn=wd_specific_issues)
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=222
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=223 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Nicobar",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Nicobar",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=224
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=225
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=226 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Norfolk",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Norfolk",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=227
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=228
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=229  #### south African province AND name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-grep("North West",zaf_regs)
-
-reg_i <- shp_zaf[grep("North West",shp_zaf$NAME_1),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=230   #### south African province AND name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-grep("Northern Cape",zaf_regs)
-
-reg_i <- shp_zaf[grep("Northern Cape",shp_zaf$NAME_1),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=231 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=232 #### south African province AND name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-grep("Limpopo",zaf_regs)
-
-reg_i <- shp_zaf[grep("Limpopo",shp_zaf$NAME_1),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=233
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=234
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=235
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=236
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=237 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Nuevo",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Nuevo",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=238
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=239
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=240
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=241
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=242
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=243
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=244
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=245
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=246
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=247
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=248 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=249
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=250
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=251
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=252
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=253 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=254
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=255 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Azores",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Azores",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=256 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Madeira",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Madeira",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=257 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Portugal",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Portugal",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=258 #### São Tomé and Principe estão juntos.   
-####Separated shapefile needed
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-feature <- shp_griis[grep(tab_regs[i],shp_griis$Region),]
-cropped <- crop(feature,extent(7.2, 7.5, 1.5, 1.7))
-
-plot(cropped)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[grep("Sao Tome",table$Region),]
-
-reg_i <- cropped
+#if not
 
 reg_i
 plot(reg_i)
@@ -6261,706 +8448,42 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = "BONAIRE"
 
 a <- spChFIDs(a,paste(i))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
 
+shp_birds$GAVIARegion
 
-i=259
+#plot(shp_birds)
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])] <- "BONAIRE"
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])]
 
-reg_i
-plot(reg_i)
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+j=3
 
-#make shapefile
+ant[j]
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+ant_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ant[j]),]
 
+ant_tab
 
-i=260
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+reg_i <- shp_ant[grep("Cura",shp_ant$NAME_1),]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+#verify if feature is already in the shapefile
 
-reg_i
-plot(reg_i)
+toupper(ant[j]) %in% shp_birds$GAVIARegion
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=261
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=262
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=263
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=264 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Quere",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Quere",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=265
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=266 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[grep("union",shp_griis$Region),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=267 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Revill",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Revill",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=268
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=269
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=270 #### no aliens listed, so just ignored
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-table9 <- table8[-which(table8$Region == tab_regs[i]),]
-
-
-i=271
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=272  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[grep("Russia",shp_griis$Region),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=273  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=274 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=275  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=276  #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=277
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=278 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=279
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=280
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=281 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Potosi",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Potosi",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=282 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=283
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=284 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Santa Fe",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Santa Fe",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=285
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=286 #### São Tomé and Principe estão juntos.   
-####Separated shapefile needed
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-feature <- shp_griis[grep(tab_regs[i],shp_griis$Region),]
-cropped <- crop(feature,extent(6.3, 6.8, 0, 0.5))
-
-plot(cropped)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-reg_i <- cropped
+#if not
 
 reg_i
 plot(reg_i)
@@ -6975,521 +8498,42 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = toupper(ant[j])
 
-a <- spChFIDs(a,paste(i))
+a <- spChFIDs(a,paste0(i,"_",j))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
 
+shp_birds$GAVIARegion
 
-i=287
+#plot(shp_birds)
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])] <- toupper(ant[j])
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])]
 
-reg_i
-plot(reg_i)
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+j=4
 
-#make shapefile
+ant[j]
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+ant_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ant[j]),]
 
+ant_tab
 
-i=288
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+reg_i <- shp_ant[grep(ant[j],shp_ant$NAME_1),]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+#verify if feature is already in the shapefile
 
-reg_i
-plot(reg_i)
+toupper(ant[j]) %in% shp_birds$GAVIARegion
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=289
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=290
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=291
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=292
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=293 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[which(shp_griis$Region == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=294
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=295
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=296
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=297 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[grep("Soqotra",shp_griis$Region),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=298
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=299
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=300
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=301
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=302
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=303
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=304 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Balea",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Balea",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=305 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Cana",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Cana",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=306 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Spain",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Spain",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=308
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=309 #### both ants and griis shapes clump Ascension, St Helena, and Tristas
-##### da Cunha together. Separated shapefile needed
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-feature <- shp_griis[grep("Helena",shp_griis$Region),]
-cropped <- crop(feature,extent(-5.8, -5.6, -16.1, -15.8))
-
-plot(cropped)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-table[grep("Helena",table$Region),]
-table[grep("Ascension",table$Region),]
-
-
-reg_i <- cropped
+#if not
 
 reg_i
 plot(reg_i)
@@ -7504,669 +8548,47 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = toupper(ant[j])
 
-a <- spChFIDs(a,paste(i))
+a <- spChFIDs(a,paste0(i,"_",j))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
 
+shp_birds$GAVIARegion
 
-i=310 ## St Martin and St Barthélémy sont ensemble dans cette list, mais
-   ##### séparés dans le shafile de GRIIS. 
+#plot(shp_birds)
 
-tab_regs[i]
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])] <- toupper(ant[j])
 
-st_martin <- shp_griis[grep("Saint Martin",shp_griis$Region),]
-st_barth <- shp_griis[grep("Saint Bart",shp_griis$Region),]
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])]
 
-st_st <- spRbind(st_martin,st_barth)
-
-a <- gUnaryUnion(st_st)
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
 
-i=311
+j=5 #SAINT MARTIN ET SAINT BARTHELEMY ARE FRENCH!!! WHO MADE THIS DATABASE?
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+ant[j]
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+ant_tab <- table2[which(table2$CountryName == countries[i] &
+                          table2$AreaName1 == ant[j]),]
 
-reg_i
-plot(reg_i)
+ant_tab
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
+reg_i1 <- shp_griis[grep("Saint Martin",shp_griis$Region),]
+reg_i2 <- shp_griis[grep("Saint Bart",shp_griis$Region),]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+reg_i <- spRbind(reg_i1,reg_i2)
 
-#make shapefile
+#verify if feature is already in the shapefile
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+toupper(ant[j]) %in% shp_birds$GAVIARegion
 
-
-i=312
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+#if not
 
 reg_i
 plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=313
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=314
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=315
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=316
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=317 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Tajikistan",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Tajikistan",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=318
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=319
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=320
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=321
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=322
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=323
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=324
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=325
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=326
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=327
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=328
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=329
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=330 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Tucuman",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Tucuman",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=331
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=332
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=333
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=334
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=335
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=336
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=337
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=338
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=339 #### region taken from GRIIS shapefile, attribute table must be modified
-########## to include the feature in the shp
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-reg_i <- shp_griis[grep("Virgin",shp_griis$Region),]
-reg_i <- reg_i[2,]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
 plot(world,col="gray70",border=NA)
 plot(reg_i,add=T,col="red",border=NA)
@@ -8178,488 +8600,30 @@ plot(reg_i,add=T,col="red",border=NA)
 a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
 #into SpatialPolygon
 
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
+a$GAVIARegion = toupper(ant[j])
 
-a <- spChFIDs(a,paste(i))
+a <- spChFIDs(a,paste0(i,"_",j))
 
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+shp_birds <- spRbind(shp_birds,a)
 
+shp_birds$GAVIARegion
 
-i=340
+#plot(shp_birds)
 
-tab_regs[i]
-tab_regs[i] %in% ant_regs
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])] <- toupper(ant[j])
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
+table2$GAVIARegion[which(table2$CountryName == countries[i] &
+                           table2$AreaName1 == ant[j])]
 
-reg_i
-plot(reg_i)
+t <- table2[which(!is.na(table2$GAVIARegion)),]
 
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
 
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
+wd <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/Shapefile"
 
-#make shapefile
+writeOGR(shp_birds,layer = "Shapefile_birds",drive = "ESRI Shapefile",
+         dsn = wd)
 
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
+setwd(wd)
 
-
-i=341
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=342 #### no aliens listed, so just ignored
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-table10 <- table9[-which(table9$Region == tab_regs[i]),]
-
-
-i=343
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=344
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=345
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=346
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=347 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Viet",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Viet",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=348
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=349
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=350
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=351
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=352 ## North Western Australia and St South Western Australia sont ensemble dans cette list, mais
-##### séparés dans le shapefile de ants. 
-
-tab_regs[i]
-
-reg_i <- shp_ants[grep("Western Australia",shp_ants$BENTITY2_N),]
-
-a <- gUnaryUnion(st)
-
-plot(a)
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=353 #### south African province AND name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-tab_regs[i] %in% griis_regs
-tab_regs[i] %in% zaf_regs
-grep("Western Cape",zaf_regs)
-
-reg_i <- shp_zaf[grep("Western Cape",shp_zaf$NAME_1),]
-reg_i <- reg_i[2,]
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-### modify attribute table
-
-a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
-#into SpatialPolygon
-
-a$BENTITY2_N = tab_regs[i]
-a$POINT = "NA"
-
-a <- spChFIDs(a,paste(i))
-
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=354
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=355
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=356
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=357 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Yuca",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Yuca",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=358 #just a name issue
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-shp_ants[grep("Yukon",shp_ants$BENTITY2_N),]
-
-reg_i <- shp_ants[grep("Yukon",shp_ants$BENTITY2_N),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-a$BENTITY2_N <- tab_regs[i]  #standardise country name
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-i=359 
-
-tab_regs[i]
-tab_regs[i] %in% ant_regs
-
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == tab_regs[i]),]
-
-reg_i
-plot(reg_i)
-
-#visualise and check if region is right
-table[which(table$Region == tab_regs[i]),]
-
-plot(world,col="gray70",border=NA)
-plot(reg_i,add=T,col="red",border=NA)
-
-#make shapefile
-
-a <- spChFIDs(reg_i,paste(i))
-shp_rep_amph <-spRbind(shp_rep_amph,a)
-
-
-
-shp_rep_amph
-plot(shp_rep_amph,col="khaki")
-plot(a,col="green",add=T)
-
-
-
-
-
-
-
-
-
-dsn1 <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
-
-writeOGR(shp_rep_amph,layer="Regions_reptiles_amphibians",
-         dsn = dsn1, driver = "ESRI Shapefile")
-
-#save new table (without excluded entries)
-
-setwd(wd_data_amph_rep)
-write.csv(table10,"Checklist_amphibians_reptiles.csv",row.names = F)
-
-shp <- readOGR("Regions_reptiles_amphibians",dsn=dsn1)
-
-length(unique(shp@data$BENTITY2_N))
+write.csv(table2,"Tables.csv")
