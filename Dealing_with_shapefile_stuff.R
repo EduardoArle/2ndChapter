@@ -4,6 +4,7 @@ wd_clip <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Spec
 wd_indonesia_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/IDN_adm"
 wd_specific_issues <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/Specific_shp_issues"
 wd_malaysia_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/MYS_adm"
+wd_uk_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA/GBR_adm"
 
 nf_lab <- readOGR("Newfoundland_Labrador",dsn=wd_clip)
 
@@ -157,3 +158,9 @@ shp_mal <- spRbind(peninsula,borneo)
 
 writeOGR(shp_mal,layer = "Malaysia",drive = "ESRI Shapefile",
          dsn = wd_specific_issues)
+
+
+#### UK
+
+uk_shp <- readOGR("GBR_adm1", dsn = wd_uk_shp)
+
