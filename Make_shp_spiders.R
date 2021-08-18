@@ -2074,8 +2074,7 @@ t <- table2[which(!is.na(table2$SpiderRegion)),]
 shp_back <- shp_spiders
 
 
-i=44 #### region taken from ants shapefile, attribute table must be modified
-########## to include the feature in the shp
+i=44 #### Borneo here refers to the Malaysian part only (I suppose...)
 
 regions[i]
 
@@ -2083,9 +2082,13 @@ reg_tab <- table[which(table$X.8 == regions[i]),]
 
 reg_tab
 
-regions[i] %in% ant_regs
+regions[i] %in% griis_regs
+grep("Malaysia",griis_regs)
 
-reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+reg_i <- shp_griis[grep("Malaysia",shp_griis$Region),]
+
+b <- as(extent(107, 121, -2, 10), 'SpatialPolygons')
+reg_i <- crop(reg_i,b)
 
 reg_i
 plot(reg_i)
@@ -2105,6 +2108,9 @@ a$SpiderRegion = regions[i]
 a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
 
 shp_spiders <- spRbind(shp_spiders,a)
+
+row.names(a)
+row.names(shp_spiders)
 
 shp_spiders
 
@@ -13318,6 +13324,2070 @@ t <- table2[which(!is.na(table2$SpiderRegion)),]
 shp_back <- shp_spiders 
 
 
+i=277 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=278 ### Main Island Papua New Guinea (get from Papua New Guinea shp)
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+reg_i <- shp_png[which(shp_png$NAME_1 != "Bougainville" &
+                       shp_png$NAME_1 != "West New Britain" &
+                       shp_png$NAME_1 != "East New Britain" &
+                       shp_png$NAME_1 != "New Ireland" &
+                       shp_png$NAME_1 != "Manus"),]
+
+reg_i
+plot(reg_i)
+
+reg_i <- gSimplify(reg_i,tol=0.01)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=279 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=280 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=281 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=282 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=283  #### Peninsula Malaysia (Exclude Borneo)
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+grep("Malaysia",griis_regs)
+
+reg_i <- shp_griis[grep("Malaysia",shp_griis$Region),]
+
+b <- as(extent(98, 106, 0, 7.5), 'SpatialPolygons')
+reg_i <- crop(reg_i,b)
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+row.names(a)
+row.names(shp_spiders)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=284 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=285 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=286 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=287 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+#name issu, Peru again
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- "Peru"
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=288 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=289 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+grep("Phoenix",ant_regs)
+
+reg_i <- shp_ants[grep("Phoenix",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=290 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=291 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+grep("Pitcairn",ant_regs)
+
+reg_i <- shp_ants[grep("Pitcairn",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=292 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=293 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+grep("Puerto",ant_regs)
+
+reg_i <- shp_ants[grep("Puerto",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = "Puerto Rico"
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- "Puerto Rico"
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i =294 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=295 ### Russian Oblast
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+reg_i <- shp_rus[grep("Primor",shp_rus$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=296 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+grep("Edward",ant_regs)
+
+reg_i <- shp_ants[grep("Edward",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=297 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+### Repeated region, name issue
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=298 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=299 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=300 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=301 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+grep("union",griis_regs)
+
+reg_i <- shp_griis[grep("union",shp_griis$Region),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=302 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=303 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=304 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=305 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=306 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=307 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=308 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=309 #Sabah is part of the Malaysian part of Borneo
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- "Borneo"
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=310 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=311 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=312 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=313 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=314 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=315 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=316 #region in Chile (special shapefile)
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+reg_i <- shp_chile[which(shp_chile$SpdrRgn == "Chile Central"),]
+
+#verify if feature is already in the shapefile
+
+"Chile Central" %in% shp_spiders$SpiderRegion
+
+#if yes
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- "Chile Central"
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=317 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=318 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
+
+i=319 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+grep(regions[i],griis_regs)
+
+reg_i <- shp_griis[grep(regions[i],shp_griis$Region),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = "Sao Tome and Principe"
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+plot(shp_spiders)
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- "Sao Tome and Principe"
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders
+
+
+i=320 ### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$X.8 == regions[i]),]
+
+reg_tab
+
+grep("Sard",ant_regs)
+
+reg_i <- shp_ants[grep("Sard",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$SpiderRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_spiders)+1))
+
+shp_spiders <- spRbind(shp_spiders,a)
+
+shp_spiders
+
+shp_spiders$SpiderRegion
+
+#plot(shp_spiders,border=NA,col="gray70")
+
+#include region name in table
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] <- regions[i]
+
+table2$SpiderRegion[which(table2$X.8 == regions[i])] 
+
+t <- table2[which(!is.na(table2$SpiderRegion)),]
+
+shp_back <- shp_spiders 
+
 
 ################################################################
 
@@ -13329,12 +15399,12 @@ writeOGR(shp_spiders,layer = "Shapefile_spiders",drive = "ESRI Shapefile",
 shp_spiders <- readOGR("Shapefile_spiders",dsn = wd, 
                      use_iconv=TRUE, encoding="UTF-8")
 
-names(shp_birds) <- "GAVIARegion"
+names(shp_spiders) <- "SpiderRegion"
 
 setwd(wd)
 
 #write.csv(table2,"Table2.csv")
 
-table2 <- read.csv("Tables.csv")
+table2 <- read.csv("Table2.csv")
 
 unique(table2$GAVIARegion)
