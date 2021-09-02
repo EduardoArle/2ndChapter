@@ -1,5 +1,5 @@
 library(plyr);library(rgdal);library(raster);library(data.table)
-library(plotfunctions)
+library(plotfunctions);library(maptools);library(rworldmap)
 
 #list WDs
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
@@ -18,6 +18,11 @@ regs <- sort(unique(sps_reg_list$Region))
 shp_regs <- sort(unique(shp$BENTITY2_N))
 missing <- regs[-which(regs %in% shp_regs)]
 
+missing
+
+#select only the entries corresponding to amphibians
+sps_reg_list_amph <- sps_reg_list[which(sps_reg_list$Group == "Amphibia"),]
+
 #load table with occurrence counts (calculated by script occRegionAmphibia)
 setwd(wd_amph)
 sps_reg_count <- readRDS("Amphibia_occurrence_region_count")
@@ -29,29 +34,29 @@ sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$BENTITY2_N)
 
 #create column with species and region info in the amphibians table
-sps_reg_list$sps_reg <- paste0(sps_reg_list$Species,"_",
-                                sps_reg_list$Region)
+sps_reg_list_amph$sps_reg <- paste0(sps_reg_list_amph$Species,"_",
+                                sps_reg_list_amph$Region)
 
 
 #eliminate duplicated rows in the checklists file (probably due to synonyms
 #in the original names that have been resolved)
 
-sps_reg_list2 <- unique(as.data.table(sps_reg_list), #the table has to be in 
+sps_reg_list_amph2 <- unique(as.data.table(sps_reg_list_amph), #the table has to be in 
                         by = c("sps_reg"))            #data.table
 
 
 #eliminate rows combining sps_reg_count that are not listed in the amphibian table
-sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% sps_reg_list$sps_reg),]
+sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% sps_reg_list_amph$sps_reg),]
 
 #check which sps_region combination in the amphibian table have at least 1 GBIF 
 #occurrence
-sps_reg_list2$confirmed <- as.numeric(sps_reg_list2$sps_reg %in% 
+sps_reg_list_amph2$confirmed <- as.numeric(sps_reg_list_amph2$sps_reg %in% 
                                         sps_reg_count2$sps_reg)
 
 
 #calculate the percentage of species per regions confirmed by GBIF
 
-perc_confirmed <- ddply(sps_reg_list2,.(Region),summarise,
+perc_confirmed <- ddply(sps_reg_list_amph2,.(Region),summarise,
                         confirmed=mean(confirmed)*100,
                         n_sps=length(c(Region)))
 
@@ -71,7 +76,7 @@ for(i in 1:nrow(shp2))
     shp2$n_sps[i] <- perc_confirmed$n_sps[a]  
   }else{
     shp2$confirmed[i] <- NA 
-    shp2$n_sps[i] <- NA 
+    shp2$n_sps[i] <- 0 
   }
 }
 
@@ -80,9 +85,110 @@ for(i in 1:nrow(shp2))
 
 
 #count overall number of records per region
-table2_b <- ddply(table2, .(sps_reg), summarise, sum(n)) 
+sps_reg_count3 <- ddply(sps_reg_count2, .(sps_reg), summarise, sum(n)) 
 names(table2_b)[2] <- "n" #rename column
 
 #eliminate rows with less than 50 records
 table2_c <- table2_b[which(table2_b$n >= 50),]
+
+
+
+
+
+
+
+
+
+### plot maps
+
+# Load world map frame and continent outline
+setwd("C:/Users/ca13kute/Documents/sTWIST")
+
+world <- readRDS("wrld.rds")
+worldmapframe <- readRDS("Worldmapframe.rds")
+
+#load world map
+w_map <- getMap(resolution = "coarse")
+w_map <- spTransform(w_map,CRS(proj4string(world)))
+
+#### SOLUTION TO AVOID FIJI SCREWING UP THE MAP ####
+b <- as(extent(-180, 180, -21, -12.483), 'SpatialPolygons')
+fiji <- crop(shp2[91,],b)
+shp2 <- shp2[-91,]
+shp2 <-spRbind(shp2,fiji)
+
+# reproject everythign to Eckert
+worldmapframe <- spTransform(worldmapframe,CRS(proj4string(world)))
+shp3 <- spTransform(shp2,CRS(proj4string(world)))
+
+##### PLOT THE SPECIES BURDEN MAP
+
+#create vector to populate with the colours
+col_n_sps <- rep("xx",nrow(shp3)) 
+
+#create vector to populate with the transparency
+alpha_n_sps <- shp3$n_sps[which(shp3$n_sps != 0)]/
+                                                  max(shp3$n_sps) * 255
+
+col_n_sps[which(shp3$n_sps != 0)] <- rgb(135,0,0,
+                                        alpha=alpha_n_sps,
+                                        maxColorValue = 255)
+
+col_n_sps[which(col_n_sps=="xx")] <- "white"
+
+par(mar=c(2,2,2,2))
+
+plot(worldmapframe)
+plot(w_map,add=T,col="gray80",border=NA)
+plot(shp3,add=T,col="white")
+plot(shp3,col=col_n_sps,add=T)
+
+col_leg <- colorRampPalette(c("white", rgb(135,0,0,
+                                           alpha=255,
+                                           maxColorValue = 255)))
+
+myGradientLegend(valRange = c(0, max(shp3$n_sps)),
+                 pos=c(0.3,0,0.7,.015),
+                 color = col_leg(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0",paste(max(shp3$n_sps))),
+                 cex = 1)
+
+
+
+##### PLOT THE CONFIRMED MAP
+
+#create vector to populate with the colours
+col_confirmed <- rep("xx",nrow(shp3)) 
+
+#create vector to populate with the transparency
+alpha_confirmed <- shp3$confirmed[which(!is.na(shp3$confirmed))] * 2.55
+
+col_confirmed[which(!is.na(shp3$confirmed))] <- rgb(40,40,148,
+                                                    alpha=alpha_confirmed,
+                                                    maxColorValue = 255)
+
+col_confirmed[which(col_confirmed=="xx")] <- "white"
+
+par(mar=c(2,2,2,2))
+
+plot(worldmapframe)
+plot(w_map,add=T,col="gray80",border=NA)
+plot(shp3,col="white",add=T)
+plot(shp3,col=col_confirmed,add=T)
+plot(shp3[which(shp3$n_sps == 0),],add=T,density = 25)
+
+
+col_leg <- colorRampPalette(c("white", rgb(40,40,148,
+                                           alpha=255,
+                                           maxColorValue = 255)))
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(0.3,0,0.7,.015),
+                 color = col_leg(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
 

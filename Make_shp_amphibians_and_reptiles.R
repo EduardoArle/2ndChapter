@@ -8596,10 +8596,7 @@ plot(a,col="green",add=T)
 
 
 
-
-
-
-
+plot(shp_rep_amph[350,])
 
 
 dsn1 <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
