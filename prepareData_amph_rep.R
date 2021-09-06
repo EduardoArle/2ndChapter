@@ -54,7 +54,8 @@ sps_reg_list_amph2$confirmed <- as.numeric(sps_reg_list_amph2$sps_reg %in%
                                         sps_reg_count2$sps_reg)
 
 
-#calculate the percentage of species per regions confirmed by GBIF
+#calculate the percentage of species per regions confirmed by GBIF and
+#the regional species burden
 
 perc_confirmed <- ddply(sps_reg_list_amph2,.(Region),summarise,
                         confirmed=mean(confirmed)*100,
@@ -69,7 +70,7 @@ shp2$n_sps <- rep(9999,nrow(shp2))  #include n_species
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_confirmed$Region == shp$BENTITY2_N[i])
+  a <- which(perc_confirmed$Region == shp2$BENTITY2_N[i])
   if(length(a) == 1)
   {
     shp2$confirmed[i] <- perc_confirmed$confirmed[a]  
@@ -80,24 +81,111 @@ for(i in 1:nrow(shp2))
   }
 }
 
-#check if there are at least 50 records in the same continent to 
+#####check if there are at least 50 records in the same continent to 
 #model the species occurrence 
 
+#load region/continent lookup table 
+setwd(wd_table)
+reg_continent <- read.csv("Lookup_table_region_cont.csv")
 
-#count overall number of records per region
-sps_reg_count3 <- ddply(sps_reg_count2, .(sps_reg), summarise, sum(n)) 
-names(table2_b)[2] <- "n" #rename column
+reg_continent <- reg_continent[,-1]
+names(reg_continent)[2] <- "Continent"
+names(reg_continent)[1] <- "Region"
 
-#eliminate rows with less than 50 records
-table2_c <- table2_b[which(table2_b$n >= 50),]
+#merge continent info into sps_reg_list_amph2
+sps_reg_list_amph3 <- merge(sps_reg_list_amph2,reg_continent,by="Region")
+sps_reg_list_amph3$sps_cont <- paste(sps_reg_list_amph3$Species,
+                                      sps_reg_list_amph3$Continent,
+                                     sep="_")
+
+#merge continent info into sps_reg_count2
+names(sps_reg_count2)[3] <- "Region"
+sps_reg_count3 <- merge(sps_reg_count2,reg_continent,by="Region")
+sps_reg_count3$sps_cont <- paste(sps_reg_count3$species,
+                                 sps_reg_count3$Continent,
+                                 sep="_")
+
+#count sps_continent number of occurrences
+sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
+
+#eliminate rows with less than 50 occurrences
+sps_cont_n2 <- sps_cont_n[which(sps_cont_n$V1 >=50),]
+
+#check which sps_continent combination in the amphibian table have at 
+#least 50 GBIF occurrence
+sps_reg_list_amph3$modelling <- as.numeric(sps_reg_list_amph3$sps_cont %in% 
+                                             sps_cont_n2$sps_cont)
+
+#calculate the percentage of species per regions having at least 50 records
+perc_modelling <- ddply(sps_reg_list_amph3,.(Region),summarise,
+                        perc_modelling = mean(modelling)*100)
 
 
+#include the number of species and the percentage of species listed confirmed in 
+#the shapefile
+
+shp2$modelling <- rep(9999,nrow(shp2))  #include percentage of sps with 50 recs
+
+for(i in 1:nrow(shp2))
+{
+  a <- which(perc_modelling$Region == shp2$BENTITY2_N[i])
+  if(length(a) == 1)
+  {
+    shp2$modelling[i] <- perc_modelling$perc_modelling[a]  
+  }else{
+    shp2$modelling[i] <- NA 
+  }
+}
 
 
+###### calculate range dynamics evidence
+
+#eliminate rows corresponding to years before 1980 and after 2019
+#as well as rows not containing year information
+sps_reg_count3 <- sps_reg_count2[which(!is.na(sps_reg_count2$year)),]
+sps_reg_count3 <- sps_reg_count3[which(sps_reg_count3$year >= 1970 &
+                                         sps_reg_count3$year <= 2019),]
+
+#create column informing to with lustre the occurrences belong
+sps_reg_count3$lustre <- floor((sps_reg_count3$year - 1970) / 5) + 1
+
+#count sps_reg occurrence in the 5 year period
+sps_reg_count4 <- ddply(sps_reg_count3,.(species,Region,sps_reg,lustre),
+                summarise, n_5y = sum(n))
+
+#eliminate rows with combination sps_reg_n_5y < 10
+sps_reg_count5 <- sps_reg_count4[-which(sps_reg_count4$n_5y < 10),]
+
+#count how many periods of five years per region have at least 10 rec
+sps_reg_count6 <- ddply(sps_reg_count5,.(Region),nrow)
+
+#merge sps number per region to range dynamics value
+tab_rd_n <- merge(sps_reg_count6,shp2@data,
+                  by.x = "Region", by.y = "BENTITY2_N")
+
+#calculate Rd
+tab_rd_n$Rd <- tab_rd_n$V1/tab_rd_n$n_sps*10
+
+#include the range dynamics value in the shp
+
+shp2$Rd <- rep(9999,nrow(shp2))  #include percentage of confirmed sps
+
+for(i in 1:nrow(shp2))
+{
+  a <- which(tab_rd_n$Region == shp2$BENTITY2_N[i])
+  if(length(a) == 1)
+  {
+    shp2$Rd[i] <- tab_rd_n$Rd[a]  
+  }else{
+    shp2$Rd[i] <- ifelse(shp2$BENTITY2_N[i] %in% 
+                           sps_reg_list_amph3$Region,0,NA)
+  }
+}
 
 
+t <- shp2@data
 
-
+summary(shp2$Rd)
 
 ### plot maps
 
@@ -120,6 +208,8 @@ shp2 <-spRbind(shp2,fiji)
 # reproject everythign to Eckert
 worldmapframe <- spTransform(worldmapframe,CRS(proj4string(world)))
 shp3 <- spTransform(shp2,CRS(proj4string(world)))
+
+
 
 ##### PLOT THE SPECIES BURDEN MAP
 
@@ -156,7 +246,6 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
                  cex = 1)
 
 
-
 ##### PLOT THE CONFIRMED MAP
 
 #create vector to populate with the colours
@@ -177,7 +266,7 @@ plot(worldmapframe)
 plot(w_map,add=T,col="gray80",border=NA)
 plot(shp3,col="white",add=T)
 plot(shp3,col=col_confirmed,add=T)
-plot(shp3[which(shp3$n_sps == 0),],add=T,density = 25)
+plot(shp3[which(shp3$n_sps == 0),],add=T,density = 100)
 
 
 col_leg <- colorRampPalette(c("white", rgb(40,40,148,
@@ -192,3 +281,74 @@ myGradientLegend(valRange = c(0, 100),
                  values = c("0","100%"),
                  cex = 1)
 
+
+##### PLOT THE MODELLING MAP
+
+#create vector to populate with the colours
+col_modelling <- rep("xx",nrow(shp3)) 
+
+#create vector to populate with the transparency
+alpha_modelling <- shp3$modelling[which(!is.na(shp3$modelling))] * 2.55
+
+col_modelling[which(!is.na(shp3$modelling))] <- rgb(191,144,0,
+                                                    alpha=alpha_modelling,
+                                                    maxColorValue = 255)
+
+col_modelling[which(col_modelling=="xx")] <- "white"
+
+par(mar=c(2,2,2,2))
+
+plot(worldmapframe)
+plot(w_map,add=T,col="gray80",border=NA)
+plot(shp3,col="white",add=T)
+plot(shp3,col=col_modelling,add=T)
+plot(shp3[which(shp3$n_sps == 0),],add=T,density = 100)
+
+
+col_leg <- colorRampPalette(c("white", rgb(191,144,0,
+                                           alpha=255,
+                                           maxColorValue = 255)))
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(0.3,0,0.7,.015),
+                 color = col_leg(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
+
+
+##### PLOT THE RANGE DYNAMICS MAP
+
+#create vector to populate with the colours
+col_Rd <- rep("xx",nrow(shp3)) 
+
+#create vector to populate with the transparency
+alpha_Rd <- shp3$Rd[which(!is.na(shp3$Rd))] * 2.55
+
+col_Rd[which(!is.na(shp3$Rd))] <- rgb(56,87,35,
+                                      alpha=alpha_Rd,
+                                      maxColorValue = 255)
+
+col_Rd[which(col_Rd=="xx")] <- "white"
+
+par(mar=c(2,2,2,2))
+
+plot(worldmapframe)
+plot(w_map,add=T,col="gray80",border=NA)
+plot(shp3,col="white",add=T)
+plot(shp3,col=col_Rd,add=T)
+plot(shp3[which(shp3$n_sps == 0),],add=T,density = 100)
+
+
+col_leg <- colorRampPalette(c("white", rgb(56,87,35,
+                                           alpha=255,
+                                           maxColorValue = 255)))
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(0.3,0,0.7,.015),
+                 color = col_leg(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
