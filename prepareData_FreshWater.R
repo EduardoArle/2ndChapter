@@ -1,8 +1,62 @@
 library(plyr);library(rgdal);library(raster);library(data.table)
-library(plotfunctions)
+library(plotfunctions);library(maptools);library(rworldmap)
 
-#load table with occurrence counts (calculated in previous scripts)
-wd.data <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fresh_water"
+#list WDs
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Simplified_FreshWater_shp"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Data/datatoFigshare"
+wd_freshwater <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater"
+  
+#load shp
+shp <- readOGR("Basin042017_3119",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
+
+#check if all regions listed in the table are represented
+#in the shapefile
+setwd(wd_table)
+sps_reg_list <- read.csv2("Occurrence_Table.csv") #load table
+regs <- sort(unique(sps_reg_list$X1.Basin.Name))
+shp_regs <- sort(unique(shp$BasinName))
+missing <- regs[-which(regs %in% shp_regs)]
+
+missing
+
+#prepare sps list
+
+#change col names
+names(sps_reg_list) <- gsub("^X[0-9].","\\1",names(sps_reg_list))
+
+#eliminate questinable records
+sps_reg_list2 <- sps_reg_list[which(sps_reg_list$Occurrence.Status == 
+                                      "valid"),]
+
+#eliminate native records
+sps_reg_list3 <- sps_reg_list2[which(sps_reg_list2$Native.Exotic.Status == 
+                                       "exotic"),]
+
+
+#substitute "." for " " in species names
+sps_reg_list3$Fishbase.Valid.Species.Name <- gsub("\\."," ",
+                                                  sps_reg_list3$Fishbase.Valid.Species.Name)
+
+#make sps list
+sps_list <- unique(sps_reg_list3$Fishbase.Valid.Species.Name)
+
+#save sps_list
+setwd(wd_freshwater)
+saveRDS(sps_list,"Sps_list_freshwater")
+
+#save sps_list
+setwd(wd_table)
+saveRDS(sps_list,"Sps_list_freshwater")
+
+
+##### Use taxonomicHarmonisation script
+
+
+
+
+##################################################################
+
 
 setwd(wd.data)
 table <- readRDS("Occurrence_region_count")
@@ -14,24 +68,9 @@ wd_shp <-
   "C:/Users/ca13kute/Documents/2nd_Chapter/Fresh_water/Data/datatoFigshare"
 shp <- readOGR("Basin042017_3119",dsn=wd_shp)
 
-#load FreshWater master file 
-setwd(wd_shp)
-sps_reg_list <- read.csv2("Occurrence_table.csv")
 
-#change col names
-names(sps_reg_list) <- gsub("^X[0-9].","\\1",names(sps_reg_list))
 
-#eliminate questinable records
-sps_reg_list2 <- sps_reg_list[which(sps_reg_list$Occurrence.Status == 
-                                      "valid"),]
 
-#eliminate native records
-sps_reg_list3 <- sps_reg_list2[which(sps_reg_list2$Native.Exotic.Status == 
-                                      "exotic"),]
-
-#substitute "." for " " in species names
-sps_reg_list3$Fishbase.Valid.Species.Name <- gsub("\\."," ",
-                                    sps_reg_list3$Fishbase.Valid.Species.Name)
 
 #create column with species and region info in the occurrence count table
 table$sps_reg <- paste0(table$species,"_",table$freshWaterRegion)

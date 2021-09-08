@@ -4,7 +4,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 #list WDs
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
-wd_amph <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians"
+wd_rep <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Reptiles"
 
 #load shp
 shp <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
@@ -21,11 +21,18 @@ missing <- regs[-which(regs %in% shp_regs)]
 missing
 
 #select only the entries corresponding to amphibians
-sps_reg_list_amph <- sps_reg_list[which(sps_reg_list$Group == "Amphibia"),]
+sps_reg_list_amph <- sps_reg_list[which(sps_reg_list$Group == "Reptilia"),]
+sps_list <- unique(sps_reg_list_amph$Species)
+
+#save sps_list
+setwd(wd_rep)
+saveRDS(sps_list,"Sps_list_rep")
+
+##### Use taxonomicHarmonisation script
 
 #load table with occurrence counts (calculated by script occRegionAmphibia)
-setwd(wd_amph)
-sps_reg_count <- readRDS("Amphibia_occurrence_region_count")
+setwd(wd_rep)
+sps_reg_count <- readRDS("Reptilia_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
@@ -34,30 +41,31 @@ sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$BENTITY2_N)
 
 #create column with species and region info in the amphibians table
-sps_reg_list_amph$sps_reg <- paste0(sps_reg_list_amph$Species,"_",
-                                sps_reg_list_amph$Region)
+sps_reg_list_rep$sps_reg <- paste0(sps_reg_list_rep$Species,"_",
+                                sps_reg_list_rep$Region)
 
 
 #eliminate duplicated rows in the checklists file (probably due to synonyms
 #in the original names that have been resolved)
 
-sps_reg_list_amph2 <- unique(as.data.table(sps_reg_list_amph), #the table has to be in 
+sps_reg_list_rep2 <- unique(as.data.table(sps_reg_list_rep), #the table has to be in 
                         by = c("sps_reg"))            #data.table
 
 
-#eliminate rows combining sps_reg_count that are not listed in the amphibian table
-sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% sps_reg_list_amph$sps_reg),]
+#eliminate rows combining sps_reg_count that are not listed in the reptile table
+sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 
+                                        sps_reg_list_rep$sps_reg),]
 
-#check which sps_region combination in the amphibian table have at least 1 GBIF 
+#check which sps_region combination in the reptile table have at least 1 GBIF 
 #occurrence
-sps_reg_list_amph2$confirmed <- as.numeric(sps_reg_list_amph2$sps_reg %in% 
+sps_reg_list_rep2$confirmed <- as.numeric(sps_reg_list_rep2$sps_reg %in% 
                                         sps_reg_count2$sps_reg)
 
 
 #calculate the percentage of species per regions confirmed by GBIF and
 #the regional species burden
 
-perc_confirmed <- ddply(sps_reg_list_amph2,.(Region),summarise,
+perc_confirmed <- ddply(sps_reg_list_rep2,.(Region),summarise,
                         confirmed=mean(confirmed)*100,
                         n_sps=length(c(Region)))
 
@@ -92,10 +100,10 @@ reg_continent <- reg_continent[,-1]
 names(reg_continent)[2] <- "Continent"
 names(reg_continent)[1] <- "Region"
 
-#merge continent info into sps_reg_list_amph2
-sps_reg_list_amph3 <- merge(sps_reg_list_amph2,reg_continent,by="Region")
-sps_reg_list_amph3$sps_cont <- paste(sps_reg_list_amph3$Species,
-                                      sps_reg_list_amph3$Continent,
+#merge continent info into sps_reg_list_rep2
+sps_reg_list_rep3 <- merge(sps_reg_list_rep2,reg_continent,by="Region")
+sps_reg_list_rep3$sps_cont <- paste(sps_reg_list_rep3$Species,
+                                      sps_reg_list_rep3$Continent,
                                      sep="_")
 
 #merge continent info into sps_reg_count2
@@ -113,11 +121,11 @@ sps_cont_n2 <- sps_cont_n[which(sps_cont_n$V1 >=50),]
 
 #check which sps_continent combination in the amphibian table have at 
 #least 50 GBIF occurrence
-sps_reg_list_amph3$modelling <- as.numeric(sps_reg_list_amph3$sps_cont %in% 
+sps_reg_list_rep3$modelling <- as.numeric(sps_reg_list_rep3$sps_cont %in% 
                                              sps_cont_n2$sps_cont)
 
 #calculate the percentage of species per regions having at least 50 records
-perc_modelling <- ddply(sps_reg_list_amph3,.(Region),summarise,
+perc_modelling <- ddply(sps_reg_list_rep3,.(Region),summarise,
                         perc_modelling = mean(modelling)*100)
 
 
@@ -178,14 +186,19 @@ for(i in 1:nrow(shp2))
     shp2$Rd[i] <- tab_rd_n$Rd[a]  
   }else{
     shp2$Rd[i] <- ifelse(shp2$BENTITY2_N[i] %in% 
-                           sps_reg_list_amph3$Region,0,NA)
+                           sps_reg_list_rep3$Region,0,NA)
   }
 }
 
 
-t <- shp2@data
+#save tables
 
-summary(shp2$Rd)
+table_res <- shp2@data
+table_res2 <- table_res[,c(1,4,3,5,6)]
+names(table_res2)[1] <- "Region"
+
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Reptiles/Tables")
+write.csv(table_res2,"Indices_reptiles_region.csv",row.names = F)
 
 ### plot maps
 
@@ -216,15 +229,13 @@ shp3 <- spTransform(shp2,CRS(proj4string(world)))
 #create vector to populate with the colours
 col_n_sps <- rep("xx",nrow(shp3)) 
 
-#create vector to populate with the transparency
-alpha_n_sps <- shp3$n_sps[which(shp3$n_sps != 0)]/
-                                                  max(shp3$n_sps) * 255
+#create vector to populate with the transparency (use log scale)
+#sum 1 to make 0s be 0s
+alpha_n_sps <- log(shp3$n_sps+1)/max(log(shp3$n_sps+1)) * 255
 
-col_n_sps[which(shp3$n_sps != 0)] <- rgb(135,0,0,
-                                        alpha=alpha_n_sps,
-                                        maxColorValue = 255)
-
-col_n_sps[which(col_n_sps=="xx")] <- "white"
+col_n_sps <- rgb(135,0,0,
+                 alpha=alpha_n_sps,
+                 maxColorValue = 255)
 
 par(mar=c(2,2,2,2))
 
@@ -237,14 +248,18 @@ col_leg <- colorRampPalette(c("white", rgb(135,0,0,
                                            alpha=255,
                                            maxColorValue = 255)))
 
-myGradientLegend(valRange = c(0, max(shp3$n_sps)),
+# could not plot values the way I want (log) adapt the function
+myGradientLegend(valRange = c(0, max(shp3$n_sps)), 
                  pos=c(0.3,0,0.7,.015),
-                 color = col_leg(20),
+                 color = col_leg(20), 
                  side = 1,
-                 n.seg = 0,
-                 values = c("0",paste(max(shp3$n_sps))),
+                 n.seg = c(0,max(shp3$n_sps)/4,max(shp3$n_sps)/2,
+                           max(shp3$n_sps)*3/4,max(shp3$n_sps)),
+                 values = c("0",paste(round(exp(log(max(shp3$n_sps))/4))),
+                            paste(round(exp(log(max(shp3$n_sps))/2))),
+                            paste(round(exp(log(max(shp3$n_sps))*3/4))),
+                            paste(max(shp3$n_sps))),
                  cex = 1)
-
 
 ##### PLOT THE CONFIRMED MAP
 
