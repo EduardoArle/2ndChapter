@@ -1,10 +1,10 @@
 library("plyr");library("data.table")
 
 #set directory with the selected points
-setwd("/gpfs1/data/idiv_meyer/01_projects/eduardo/2nd_chapter/Reptilia_data")
+setwd("/gpfs1/data/idiv_meyer/01_projects/eduardo/2nd_chapter/Freshwater")
 
 #read table in
-table <- read.csv("Alien_reptiles_GBIF_occurrences.csv")
+table <- read.csv("Alien_freshwater_GBIF_occurrences.csv")
 
 #eliminate fossil specimens
 table2 <- table[-which(table$basisOfRecord == "FOSSIL_SPECIMEN"),]
@@ -14,6 +14,6 @@ table3 <- unique(as.data.table(table2),
                  by=c("locationID","temporalID","speciesID"))
 
 #count observations per species per year per region
-table4 <- ddply(table3,.(species,year,BENTITY2_N), nrow)
+table4 <- ddply(table3,.(species,year,BasinName), nrow)
 
-saveRDS(table4,"Reptilia_occurrence_region_count")
+saveRDS(table4,"Freshwater_occurrence_region_count")

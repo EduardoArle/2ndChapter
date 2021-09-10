@@ -21,8 +21,8 @@ missing <- regs[-which(regs %in% shp_regs)]
 missing
 
 #select only the entries corresponding to amphibians
-sps_reg_list_amph <- sps_reg_list[which(sps_reg_list$Group == "Reptilia"),]
-sps_list <- unique(sps_reg_list_amph$Species)
+sps_reg_list_rep <- sps_reg_list[which(sps_reg_list$Group == "Reptilia"),]
+sps_list <- unique(sps_reg_list_rep$Species)
 
 #save sps_list
 setwd(wd_rep)
@@ -30,7 +30,7 @@ saveRDS(sps_list,"Sps_list_rep")
 
 ##### Use taxonomicHarmonisation script
 
-#load table with occurrence counts (calculated by script occRegionAmphibia)
+#load table with occurrence counts (calculated by script occRegionReptiles)
 setwd(wd_rep)
 sps_reg_count <- readRDS("Reptilia_occurrence_region_count")
 
@@ -40,8 +40,17 @@ names(sps_reg_count)[4] <- "n" #rename species counting column
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$BENTITY2_N)
 
-#create column with species and region info in the amphibians table
-sps_reg_list_rep$sps_reg <- paste0(sps_reg_list_rep$Species,"_",
+#include the harmonised names into the data base table
+setwd(wd_rep)
+harmo <- read.csv("Reptilia_aliens_harmonised.csv")
+harmo2 <- harmo[,c(1:2)]
+
+sps_reg_list_rep <- merge(sps_reg_list_rep,harmo2,
+                       by.x = "Species",
+                       by.y = "entry")
+
+#create column with species and region info in the reptiles table
+sps_reg_list_rep$sps_reg <- paste0(sps_reg_list_rep$gbifDarwinCore,"_",
                                 sps_reg_list_rep$Region)
 
 
@@ -102,7 +111,7 @@ names(reg_continent)[1] <- "Region"
 
 #merge continent info into sps_reg_list_rep2
 sps_reg_list_rep3 <- merge(sps_reg_list_rep2,reg_continent,by="Region")
-sps_reg_list_rep3$sps_cont <- paste(sps_reg_list_rep3$Species,
+sps_reg_list_rep3$sps_cont <- paste(sps_reg_list_rep3$gbifDarwinCore,
                                       sps_reg_list_rep3$Continent,
                                      sep="_")
 

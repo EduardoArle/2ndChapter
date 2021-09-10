@@ -22,6 +22,13 @@ missing
 
 #select only the entries corresponding to amphibians
 sps_reg_list_amph <- sps_reg_list[which(sps_reg_list$Group == "Amphibia"),]
+sps_list <- unique(sps_reg_list_amph$Species)
+
+#save sps_list
+setwd(wd_amph)
+saveRDS(sps_list,"Sps_list_amph")
+
+##### Use taxonomicHarmonisation script
 
 #load table with occurrence counts (calculated by script occRegionAmphibia)
 setwd(wd_amph)
@@ -33,10 +40,18 @@ names(sps_reg_count)[4] <- "n" #rename species counting column
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$BENTITY2_N)
 
-#create column with species and region info in the amphibians table
-sps_reg_list_amph$sps_reg <- paste0(sps_reg_list_amph$Species,"_",
-                                sps_reg_list_amph$Region)
+#include the harmonised names into the data base table
+setwd(wd_amph)
+harmo <- read.csv("Amphibia_aliens_harmonised.csv")
+harmo2 <- harmo[,c(1:2)]
 
+sps_reg_list_amph <- merge(sps_reg_list_amph,harmo2,
+                          by.x = "Species",
+                          by.y = "entry")
+
+#create column with species and region info in the amphibians table
+sps_reg_list_amph$sps_reg <- paste0(sps_reg_list_amph$gbifDarwinCore,"_",
+                                   sps_reg_list_amph$Region)
 
 #eliminate duplicated rows in the checklists file (probably due to synonyms
 #in the original names that have been resolved)
@@ -94,7 +109,7 @@ names(reg_continent)[1] <- "Region"
 
 #merge continent info into sps_reg_list_amph2
 sps_reg_list_amph3 <- merge(sps_reg_list_amph2,reg_continent,by="Region")
-sps_reg_list_amph3$sps_cont <- paste(sps_reg_list_amph3$Species,
+sps_reg_list_amph3$sps_cont <- paste(sps_reg_list_amph3$gbifDarwinCore,
                                       sps_reg_list_amph3$Continent,
                                      sep="_")
 
