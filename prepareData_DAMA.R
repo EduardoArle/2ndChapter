@@ -1,4 +1,29 @@
-library(rgdal);library(raster)
+library(plyr);library(rgdal);library(raster);library(data.table)
+library(plotfunctions);library(maptools);library(rworldmap)
+
+#list WDs
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals"
+
+#load shp
+shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
+
+#check if all regions listed in the table are represented
+#in the shapefile
+setwd(wd_table)
+sps_reg_list <- read.csv("Alien_mammal_checklist.csv") #load table
+sps_reg_list <- sps_reg_list[,-1]
+regs <- sort(unique(sps_reg_list$Region))
+shp_regs <- sort(unique(shp$BENTITY2_N))
+missing <- regs[-which(regs %in% shp_regs)]
+
+missing
+
+
+
+
+#####################################################
 
 wd_mapping <- "C:/Users/ca13kute/Documents/Soup/World_simple_map"
 
