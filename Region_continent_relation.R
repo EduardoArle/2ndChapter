@@ -4,7 +4,6 @@ library(raster);library(rgdal);library(rgeos)
 ############## Amphibians and Reptiles ##########################
 
 
-
 #list WDs
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
@@ -363,4 +362,81 @@ missing_cont
 
 #save lookup tabe 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater")
+write.csv(reg_cont,"Lookup_table_region_cont.csv")
+
+
+
+############## Ants and mammals ##########################
+
+
+#list WDs
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
+wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
+
+#load shps
+shp_ants_mammals <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
+                     use_iconv=TRUE, encoding="UTF-8")
+
+shp_IPBES <- readOGR("IPBES_SubRegion",dsn = wd_IPBES)
+
+#loop though shapefile features to identify each of their continents
+
+pts_regs <- list()
+for(i in 1:nrow(shp_ants_mammals))
+{
+  pts_regs[[i]] <- spsample(shp_ants_mammals[i,], n=100, type='regular') #seed points in each region
+  print(i)
+}
+
+#get continent of each region
+
+continents <- character()
+for(i in 422:nrow(shp_ants_mammals))
+{
+  a <- over(pts_regs[[i]],shp_IPBES)
+  b <- table(a$Region)
+  c <- which.max(b)
+  d <- names(c)
+  continents[i] <- d
+  print(i)
+}
+
+### manually fix what does not work
+
+shp_ants_mammals[i,]
+plot(world)
+plot(pts_regs[[i]],add=T,pch=19,col="red")
+
+#i=32 Baker Island
+continents[i] <- "Oceania"
+
+#i=85 Coral Sea Islands
+continents[i] <- "Oceania"
+
+#i=153 Howland Island
+continents[i] <- "Oceania"
+
+#i=178 Johnston Atoll
+continents[i] <- "Oceania"
+
+#i=387 Spratly Islands
+continents[i] <- "South-East Asia"
+
+#i=416 Tokelau
+continents[i] <- "Oceania"
+
+#i=421 Tromelin Island
+continents[i] <- "East Africa and adjacent islands"
+
+#join info
+reg_cont <- data.frame(Region = shp_ants_mammals$BENTITY2_N,
+                       Continent = continents)
+
+#manually fix regions that have not been asigned to a continent
+missing_cont <- reg_cont[which(is.na(reg_cont$Continent)),]
+
+missing_cont
+
+#save lookup tabe 
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Mammals")
 write.csv(reg_cont,"Lookup_table_region_cont.csv")

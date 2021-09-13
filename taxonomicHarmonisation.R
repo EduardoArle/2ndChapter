@@ -38,6 +38,14 @@ list <- read.csv("Alien_mammal_checklist.csv")
 list <- sort(unique(list[,2]))
 
 
+#################### Ants #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants"
+
+#read species table
+setwd(wd_species)
+list <- readRDS("Sps_list_ants")
+
 
 
 
@@ -107,4 +115,11 @@ write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Mammals")
 
 write.csv(table,"Mammalia_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+
+
+#### save ants
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Ants")
+
+write.csv(table,"Ants_aliens_harmonised.csv",row.names = F)
 write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
