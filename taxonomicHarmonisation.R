@@ -47,6 +47,15 @@ setwd(wd_species)
 list <- readRDS("Sps_list_ants")
 
 
+#################### Plants #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF"
+
+#read species table
+setwd(wd_species)
+list <- readRDS("Sps_list_plants")
+
+
 
 
 ###################### HARMONISATION ######################
@@ -123,3 +132,11 @@ setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Ants")
 
 write.csv(table,"Ants_aliens_harmonised.csv",row.names = F)
 write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+
+
+#### save plants
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF")
+
+write.csv(table,"Plants_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+

@@ -1,7 +1,7 @@
 library(rgdal);library(raster)
 
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Spiders/Shapefile"
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
+wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
 
 #load shp
 shp <- readOGR("GloNAF_modified",dsn = wd_shp)

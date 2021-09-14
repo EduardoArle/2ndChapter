@@ -1,6 +1,46 @@
 library(plyr);library(rgdal);library(raster);library(data.table)
-library(plotfunctions)
+library(plotfunctions);library(maptools);library(rworldmap)
 
+#list WDs
+wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF"
+
+#load shp
+shp <- readOGR("GloNAF_modified",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
+
+#check if all regions listed in the table are represented
+#in the shapefile
+setwd(wd_table)
+sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv") #load table
+
+regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv") #table 
+#translating regions ID, names etc
+
+#make a table to include region name and obj ID into the tables
+merge_tab <- regions[,c(1,3,5)]
+
+#include region names and obj ID into the table with occurrence counts
+sps_reg_list2 <- merge(sps_reg_list,merge_tab,by="region_id",sort = F, all.x = T)
+
+#include region names and region ID into the shp attribute table
+shp@data <- merge(shp@data, merge_tab, by = "OBJIDsic", sort = F, all.x = T)
+
+regs <- sort(unique(sps_reg_list2$name))
+shp_regs <- sort(unique(shp$name))
+missing <- regs[-which(regs %in% shp_regs)]
+
+missing
+
+#fix the inconsistencies between regions in the shapefile and those listed in
+#the master file
+
+#eliminate entries not represented in the shp
+sps_reg_list3 <- sps_reg_list2[-which(sps_reg_list2$name %in% missing),]
+
+
+
+###########################################
 #load table with occurrence counts (calculated in previous scripts)
 wd.data <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/Results"
 
