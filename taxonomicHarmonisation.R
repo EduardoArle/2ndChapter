@@ -56,6 +56,14 @@ setwd(wd_species)
 list <- readRDS("Sps_list_plants")
 
 
+#################### Birds #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA"
+
+#read species table
+setwd(wd_species)
+list <- readRDS("Sps_list_birds")
+
 
 
 ###################### HARMONISATION ######################
@@ -138,5 +146,12 @@ write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF")
 
 write.csv(table,"Plants_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+
+
+#### save birds
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA")
+
+write.csv(table,"Birds_aliens_harmonised.csv",row.names = F)
 write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
 

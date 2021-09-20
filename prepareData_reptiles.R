@@ -138,14 +138,19 @@ perc_modelling <- ddply(sps_reg_list_rep3,.(Region),summarise,
                         perc_modelling = mean(modelling)*100)
 
 
-#include the number of species and the percentage of species listed confirmed in 
-#the shapefile
+#include the percentage of species with at least 50 records in the continent,
+#and name of continent in the shapefile
 
 shp2$modelling <- rep(9999,nrow(shp2))  #include percentage of sps with 50 recs
+shp2$continent <- rep(9999,nrow(shp2))  #include continent
 
 for(i in 1:nrow(shp2))
 {
   a <- which(perc_modelling$Region == shp2$BENTITY2_N[i])
+  b <- which(reg_continent$Region == shp2$BENTITY2_N[i])
+  
+  shp2$continent[i] <- reg_continent$Continent[b]
+  
   if(length(a) == 1)
   {
     shp2$modelling[i] <- perc_modelling$perc_modelling[a]  
@@ -203,7 +208,7 @@ for(i in 1:nrow(shp2))
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(1,4,3,5,6)]
+table_res2 <- table_res[,c(1,7,4,3,5,6)]
 names(table_res2)[1] <- "Region"
 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Reptiles/Tables")

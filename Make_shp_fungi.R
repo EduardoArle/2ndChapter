@@ -4559,11 +4559,3657 @@ table$FungiRegion[which(table$locality == regions[i])]
 t <- table[which(!is.na(table$FungiRegion)),]
 
 
+104 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=105 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=106 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=107 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=108 # NORTH AFRICA IS NOT A COUNTRY NOR A REGION IN ONE OF THE SIX COUNTRIES 
+#INDICATED IN THE ARTICLE AS BEING FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "NORTH AFRICA", AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE NATIONAL / SUBNATIONAL LEVEL
+
+
+i=109 # NORTH AMERICA IS NOT A COUNTRY NOR A REGION IN ONE OF THE SIX COUNTRIES 
+#INDICATED IN THE ARTICLE AS BEING FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "NORTH AMERICA, AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE NATIONAL / SUBNATIONAL LEVEL
+
+
+i=110 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=111 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+grep("Mariana",ant_regs)
+
+reg_i <- shp_ants[grep("Mariana",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=112 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=113 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=114 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=115 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=116 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=117 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=118 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=119 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=120 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=121 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=122 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=123 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=124 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=125 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=126 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=127 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=128 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=129 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+grep("Congo",ant_regs)
+
+reg_i <- shp_ants[grep("Congo",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=130  #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+grep("union",griis_regs)
+
+reg_i <- shp_griis[grep("union",shp_griis$Region),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=131 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=132 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=133 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=134 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=135 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=136  # RUSSIA IS ONE OF THE SIX COUNTRIES INDICATED IN THE ARTICLE AS BEING
+#FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "RUSSIA", AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE SUBNATIONAL LEVEL
+
+
+i=137 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=138 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=139 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=140 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=141 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=142 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=143 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=144 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=145 #### region taken from GRIIS shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% griis_regs
+
+reg_i <- shp_griis[which(shp_griis$Region == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=146 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=147 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=148 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=149 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=150 # SOUTH AMERICA IS NOT A COUNTRY NOR A REGION IN ONE OF THE SIX COUNTRIES 
+#INDICATED IN THE ARTICLE AS BEING FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "SOUTH AMERICA, AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE NATIONAL / SUBNATIONAL LEVEL
+
+
+i=151 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=152 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=153 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=154 # SOUTHERN SOUTH AMERICA IS NOT A COUNTRY NOR A REGION IN ONE OF THE SIX COUNTRIES 
+#INDICATED IN THE ARTICLE AS BEING FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "SOUTHERN SOUTH AMERICA, AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE NATIONAL / SUBNATIONAL LEVEL
+
+
+i=155 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=156#### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=157 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=158 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=159 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=160 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=161 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+grep("Tanzania",ant_regs)
+
+reg_i <- shp_ants[grep("Tanzania",shp_ants$BENTITY2_N),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=162 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=163 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=164 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=165 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=166 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=167 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=168 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=169 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=170 # UNITED STATES IS ONE OF THE SIX COUNTRIES INDICATED IN THE ARTICLE AS BEING
+#FURTHER DIVIDED INTO SMALLER ADM REGIONS.
+#DECISION: IGNORE ENTRIES AS "UNITED STATES, AND CHECK WHETHER THESE SPS 
+#HAVE BEEN REPRESENTED IN THE SUBNATIONAL LEVEL
+
+
+i=171 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=172 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=173 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=174 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=175 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=176  #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=177 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=178 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=179 #### region taken from Australia shapefile
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+grep("Western Australia",australia_regs)
+
+reg_i <- shp_australia[grep("Western Australia",shp_australia$NAME_1),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=180 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=181 #already in the shapefile as "west australia"
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+table$FungiRegion[which(table$locality == regions[i])] <- "West Australia"
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=182 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=183 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=184 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=185 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+i=186 #### region taken from ants shapefile, attribute table must be modified
+########## to include the feature in the shp
+
+regions[i]
+
+reg_tab <- table[which(table$locality == regions[i]),]
+
+reg_tab
+
+regions[i] %in% ant_regs
+
+reg_i <- shp_ants[which(shp_ants$BENTITY2_N == regions[i]),]
+
+reg_i
+plot(reg_i)
+
+plot(world,col="gray70",border=NA)
+plot(reg_i,add=T,col="red",border=NA)
+
+#make shapefile
+
+### modify attribute table
+
+a <- gBuffer(reg_i,width = 0) #buffer of 0 to transform SpatialPolygonDataFrame
+#into SpatialPolygon
+
+a$FungiRegion = regions[i]
+
+a <- spChFIDs(a,paste(nrow(shp_fungi)+1))
+
+shp_fungi <- spRbind(shp_fungi,a)
+
+shp_fungi
+
+shp_fungi$FungiRegion
+
+#plot(shp_fungi)
+
+#include region name in table
+
+table$FungiRegion[which(table$locality == regions[i])] <- regions[i]
+
+table$FungiRegion[which(table$locality == regions[i])] 
+
+t <- table[which(!is.na(table$FungiRegion)),]
+
+
+#check overlap
+
+plot(shp_fungi,col = rgb(0,0,0,0.2),border=NA)
 
 nrow(table)
 nrow(t)
 
-
+missing <- table[which(is.na(table$FungiRegion)),]
 ################################################
+
+
+################################################################
+
+wd <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi/Shapefile"
+
+writeOGR(shp_fungi,layer = "Shapefile_fungi",drive = "ESRI Shapefile",
+         dsn = wd)
+
+shp_fungi <- readOGR("Shapefile_fungi",dsn = wd, 
+                       use_iconv=TRUE, encoding="UTF-8")
+
+names(shp_fungi) <- "FungiRegion"
+
+setwd(wd)
+
+#write.csv(table,"Table.csv")
+
+table <- read.csv("Table.csv")
+
+
 
 

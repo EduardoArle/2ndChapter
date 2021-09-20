@@ -2,98 +2,80 @@ library(plyr);library(rgdal);library(raster);library(data.table)
 library(plotfunctions);library(maptools);library(rworldmap)
 
 #list WDs
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Simplified_FreshWater_shp"
-wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Data/datatoFigshare"
-wd_freshwater <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater"
-  
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals"
+
 #load shp
-shp <- readOGR("Basin042017_3119",dsn = wd_shp,
+shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
                use_iconv=TRUE, encoding="UTF-8")
 
 #check if all regions listed in the table are represented
 #in the shapefile
 setwd(wd_table)
-sps_reg_list <- read.csv2("Occurrence_Table.csv") #load table
-regs <- sort(unique(sps_reg_list$X1.Basin.Name))
-shp_regs <- sort(unique(shp$BasinName))
+sps_reg_list <- read.csv("Alien_mammal_checklist.csv") #load table
+sps_reg_list <- sps_reg_list[,-1]
+regs <- sort(unique(sps_reg_list$Region))
+shp_regs <- sort(unique(shp$BENTITY2_N))
 missing <- regs[-which(regs %in% shp_regs)]
 
 missing
 
-#prepare sps list
-
-#change col names
-names(sps_reg_list) <- gsub("^X[0-9].","\\1",names(sps_reg_list))
-
-#eliminate questinable records
-sps_reg_list2 <- sps_reg_list[which(sps_reg_list$Occurrence.Status == 
-                                      "valid"),]
-
-#eliminate native records
-sps_reg_list3 <- sps_reg_list2[which(sps_reg_list2$Native.Exotic.Status == 
-                                       "exotic"),]
-
-
-#substitute "." for " " in species names
-sps_reg_list3$Fishbase.Valid.Species.Name <- gsub("\\."," ",
-                                                  sps_reg_list3$Fishbase.Valid.Species.Name)
-
 #make sps list
-sps_list <- unique(sps_reg_list3$Fishbase.Valid.Species.Name)
+sps_list <- unique(sps_reg_list$Species)
 
 #save sps_list
-setwd(wd_freshwater)
-saveRDS(sps_list,"Sps_list_freshwater")
+setwd(wd_table)
+saveRDS(sps_list,"Sps_list_mammals")
 
 
-##### Use taxonomicHarmonisation script
+##### Use taxonomicHarmonisation script and then get occ from cluster
 
 #load table with occurrence counts (calculated by script occRegionFreshwater)
-setwd(wd_freshwater)
-sps_reg_count <- readRDS("Freshwater_occurrence_region_count")
+setwd(wd_table)
+sps_reg_count <- readRDS("Mammals_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
-                                sps_reg_count$BasinName)
+                                sps_reg_count$regAntsMammals)
 
 #include the harmonised names into the data base table
-setwd(wd_freshwater)
-harmo <- read.csv("Freshwater_aliens_harmonised.csv")
+setwd(wd_table)
+harmo <- read.csv("Mammalia_aliens_harmonised.csv")
 harmo2 <- harmo[,c(1:2)]
 
-sps_reg_list4 <- merge(sps_reg_list3,harmo2,
-                       by.x = "Fishbase.Valid.Species.Name",
+sps_reg_list2 <- merge(sps_reg_list,harmo2,
+                       by.x = "Species",
                        by.y = "entry")
 
-#create column with species and region info in the freshwater table
-sps_reg_list4$sps_reg <- paste0(sps_reg_list4$gbifDarwinCore,"_",
-                                   sps_reg_list4$Basin.Name)
+#create column with species and region info in the ants table
+sps_reg_list2$sps_reg <- paste0(sps_reg_list2$gbifDarwinCore,"_",
+                                sps_reg_list2$Region)
 
 
 #eliminate duplicated rows in the checklists file (probably due to synonyms
 #in the original names that have been resolved)
 
-sps_reg_list5 <- unique(as.data.table(sps_reg_list4), #the table has to be in 
-                            by = c("sps_reg"))            #data.table
+sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in 
+                        by = c("sps_reg"))            #data.table
 
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 
-                                        sps_reg_list5$sps_reg),]
+                                        sps_reg_list3$sps_reg),]
 
 #check which sps_region combination in the taxon table have at least 1 GBIF 
 #occurrence
-sps_reg_list5$confirmed <- as.numeric(sps_reg_list5$sps_reg %in% 
-                                            sps_reg_count2$sps_reg)
+sps_reg_list3$confirmed <- as.numeric(sps_reg_list3$sps_reg %in% 
+                                        sps_reg_count2$sps_reg)
 
 #calculate the percentage of species per regions confirmed by GBIF and
 #the regional species burden
 
-perc_confirmed <- ddply(sps_reg_list5,.(Basin.Name),summarise,
+perc_confirmed <- ddply(sps_reg_list3,.(Region),summarise,
                         confirmed=mean(confirmed)*100,
-                        n_sps=length(c(Basin.Name)))
+                        n_sps=length(c(Region)))
 
 #include the number of species and the percentage of species listed confirmed in 
 #the shapefile
@@ -104,7 +86,7 @@ shp2$n_sps <- rep(9999,nrow(shp2))  #include n_species
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_confirmed$Basin.Name == shp2$BasinName[i])
+  a <- which(perc_confirmed$Region == shp2$BENTITY2_N[i])
   if(length(a) > 0)
   {
     shp2$confirmed[i] <- perc_confirmed$confirmed[a]  
@@ -120,21 +102,18 @@ for(i in 1:nrow(shp2))
 #model the species occurrence 
 
 #load region/continent lookup table (made in script Region_continent_relation)
-setwd(wd_freshwater)
+setwd(wd_table)
 reg_continent <- read.csv("Lookup_table_region_cont.csv")
 
 reg_continent <- reg_continent[,-1]
-names(reg_continent)[2] <- "Continent"
-names(reg_continent)[1] <- "Region"
 
 #merge continent info into sps_reg_list_rep2
-sps_reg_list6 <- merge(sps_reg_list5,reg_continent,
-                       by.x = "Basin.Name",
-                       by.y = "Region")
+sps_reg_list4 <- merge(sps_reg_list3,reg_continent,
+                       by = "Region")
 
-sps_reg_list6$sps_cont <- paste(sps_reg_list6$gbifDarwinCore,
-                                    sps_reg_list6$Continent,
-                                    sep="_")
+sps_reg_list4$sps_cont <- paste(sps_reg_list4$gbifDarwinCore,
+                                sps_reg_list4$Continent,
+                                sep="_")
 
 #merge continent info into sps_reg_count2
 names(sps_reg_count2)[3] <- "Region"
@@ -149,13 +128,13 @@ sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
 #eliminate rows with less than 50 occurrences
 sps_cont_n2 <- sps_cont_n[which(sps_cont_n$V1 >=50),]
 
-#check which sps_continent combination in the amphibian table have at 
+#check which sps_continent combination in the mammals table have at 
 #least 50 GBIF occurrence
-sps_reg_list6$modelling <- as.numeric(sps_reg_list6$sps_cont %in% 
-                                            sps_cont_n2$sps_cont)
+sps_reg_list4$modelling <- as.numeric(sps_reg_list4$sps_cont %in% 
+                                        sps_cont_n2$sps_cont)
 
 #calculate the percentage of species per regions having at least 50 records
-perc_modelling <- ddply(sps_reg_list6,.(Basin.Name),summarise,
+perc_modelling <- ddply(sps_reg_list4,.(Region),summarise,
                         perc_modelling = mean(modelling)*100)
 
 
@@ -167,8 +146,8 @@ shp2$continent <- rep(9999,nrow(shp2))  #include continent
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_modelling$Basin.Name == shp2$BasinName[i])
-  b <- which(reg_continent$Region == shp2$BasinName[i])
+  a <- which(perc_modelling$Region == shp2$BENTITY2_N[i])
+  b <- which(reg_continent$Region == shp2$BENTITY2_N[i])
   
   shp2$continent[i] <- reg_continent$Continent[b]
   
@@ -204,7 +183,7 @@ sps_reg_count6 <- ddply(sps_reg_count5,.(Region),nrow)
 
 #merge sps number per region to range dynamics value
 tab_rd_n <- merge(sps_reg_count6,shp2@data,
-                  by.x = "Region", by.y = "BasinName")
+                  by.x = "Region", by.y = "BENTITY2_N")
 
 #calculate Rd
 tab_rd_n$Rd <- tab_rd_n$V1/tab_rd_n$n_sps*10
@@ -215,24 +194,24 @@ shp2$Rd <- rep(9999,nrow(shp2))  #include percentage of confirmed sps
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(tab_rd_n$Region == shp2$BasinName[i])
+  a <- which(tab_rd_n$Region == shp2$BENTITY2_N[i])
   if(length(a) == 1)
   {
     shp2$Rd[i] <- tab_rd_n$Rd[a]  
   }else{
-    shp2$Rd[i] <- ifelse(shp2$BasinName[i] %in% 
-                           sps_reg_list6$Basin.Name,0,NA)
+    shp2$Rd[i] <- ifelse(shp2$BENTITY2_N[i] %in% 
+                           sps_reg_list4$Region,0,NA)
   }
 }
 
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(1,14,11,10,12,13)]
+table_res2 <- table_res[,c(1,7,4,3,5,6)]
 names(table_res2)[1] <- "Region"
 
-setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Freshwater/Tables")
-write.csv(table_res2,"Indices_freshwater_region.csv",row.names = F)
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Mammals/Tables")
+write.csv(table_res2,"Indices_mammals_region.csv",row.names = F)
 
 
 ### plot maps
@@ -247,10 +226,21 @@ worldmapframe <- readRDS("Worldmapframe.rds")
 w_map <- getMap(resolution = "coarse")
 w_map <- spTransform(w_map,CRS(proj4string(world)))
 
+#### SOLUTION TO AVOID FIJI AND RUSSIA EAST SCREWING UP THE MAP ####
+
+b <- as(extent(-180, 180, -21, -12.483), 'SpatialPolygons')
+fiji <- crop(shp2[112,],b)
+shp2 <- shp2[-112,]
+shp2 <- spRbind(shp2,fiji)
+
+b2 <- as(extent(-179.998, 179.998, 42.2925, 77.148), 'SpatialPolygons')
+rus_east <- crop(shp2[337,],b2)
+shp2 <- shp2[-337,]
+shp2 <- spRbind(shp2,rus_east)
+
 # reproject everythign to Eckert
 worldmapframe <- spTransform(worldmapframe,CRS(proj4string(world)))
 shp3 <- spTransform(shp2,CRS(proj4string(world)))
-
 
 
 ##### PLOT THE SPECIES BURDEN MAP
@@ -396,3 +386,6 @@ myGradientLegend(valRange = c(0, 100),
                  n.seg = 0,
                  values = c("0","100%"),
                  cex = 1)
+
+
+

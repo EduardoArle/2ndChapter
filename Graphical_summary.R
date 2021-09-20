@@ -1,218 +1,306 @@
-library(rgdal);library(raster)
+library(plyr)
 
 #paths
-wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results/GloNAF"
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
-wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/ipbes_regions_mesoregions_shape"
+wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
 
-#load resuts table
+#list taxa
 setwd(wd_results)
+taxa <- list.files()
 
-table <- read.csv("GloNAF.csv")
+#load results for all taxa
+results <- list()
 
-#load GloNAF shapefile
-shp <- readOGR("GloNAF_modified",dsn=wd_shp)
+for(i in 1:length(taxa))
+{
+        setwd(paste0(wd_results,"/",taxa[i],"/Tables"))
+        results[[i]] <- read.csv(list.files()[1])
+}
 
-plot(shp)
+names(results) <- taxa
 
-#load IPBES shapefie
-ipbes <- readOGR("IPBES_mesoregions",dsn=wd_IPBES)
+#calculate average indicators per continent
+means <- list()
 
-#get mesoregion of each checklist region
-region_centre <- table
-coordinates(region_centre) <- ~LON+LAT
+for(i in 1:length(results))
+{
+        means[[i]] <- ddply(results[[i]],.(continent),
+                  summarise, 
+                  confirmed = mean(confirmed,na.rm=T),
+                  modeling = mean(modelling,na.rm=T),
+                  Rd = mean(Rd,na.rm=T),
+                  entries = sum(n_sps))
+}
 
-proj4string(region_centre) <- CRS(paste(crs(ipbes))) #indicate projection
+names(means) <- names(results)
 
-meso <- over(region_centre,ipbes)
+#make one table for each indicator
 
-#include meso_region info in the table
+confirmed <- means[[1]][,c(1,2)]
 
-table$Meso_region <- meso$Mes_Rgn
+names(confirmed)[2] <- names(means)[1]
 
-#save table and solve the regions that where not assessed to any meso region
-#manually
+for(i in 2:length(means))
+{
+        a <- means[[i]][,c(1,2)]
+        names(a)[2] <- names(means)[i]
+        
+        confirmed <- merge(confirmed,a,by="continent",all.x=T)
+}
 
-setwd(wd_results)
+confirmed$cont_short <- confirmed$continent
+confirmed$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
-write.csv(table,"GloNAF_mesoRegion_with_gaps.csv",row.names = F)
 
-############################ Scrap ##########################
+modelling <- means[[1]][,c(1,3)]
 
-#visualisation for manual assessment of regions
+names(modelling)[2] <- names(means)[1]
 
-plot(world,col="grey80",border=NA)
+for(i in 2:length(means))
+{
+        a <- means[[i]][,c(1,3)]
+        names(a)[2] <- names(means)[i]
+        
+        modelling <- merge(modelling,a,by="continent",all.x=T)
+}
 
-plot(region_centre[which(region_centre$OBJIDsic == 84),],add = T, col = "red",
-     pch = 19, cex = 0.5) #channel islands
+modelling$cont_short <- modelling$continent
+modelling$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
-plot(region_centre[which(region_centre$OBJIDsic == 91),],add = T, col = "red",
-     pch = 19, cex = 0.5) #cocos islands islands
 
-plot(region_centre[which(region_centre$OBJIDsic == 130),],add = T, col = "red",
-     pch = 19, cex = 0.5) #española
+rd <- means[[1]][,c(1,4)]
 
-plot(region_centre[which(region_centre$OBJIDsic == 151),],add = T, col = "red",
-     pch = 19, cex = 0.5) #French Frigate Shoals
+names(rd)[2] <- names(means)[1]
 
-plot(region_centre[which(region_centre$OBJIDsic == 158),],add = T, col = "darkgreen",
-     pch = 19, cex = 0.5) #Genovesa
+for(i in 2:length(means))
+{
+        a <- means[[i]][,c(1,4)]
+        names(a)[2] <- names(means)[i]
+        
+        rd <- merge(rd,a,by="continent",all.x=T)
+}
 
-plot(region_centre[which(region_centre$OBJIDsic == 202),],add = T, col = "darkgreen",
-     pch = 19, cex = 0.5) #Isabela
+rd$cont_short <- rd$continent
+rd$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
-plot(region_centre[which(region_centre$OBJIDsic == 211),],add = T, col = "darkgreen",
-     pch = 19, cex = 0.5) #Juan Fernandez
 
-plot(region_centre[which(region_centre$OBJIDsic == 227),],add = T, col = "orange",
-     pch = 19, cex = 0.5) #Kermadec Islands
 
-plot(region_centre[which(region_centre$OBJIDsic == 804),],add = T, col = "green",
-     pch = 19, cex = 0.5) #cook islands
+### plot results represented by colour in a table (all in base, bitch)
 
-plot(region_centre[which(region_centre$OBJIDsic == 547),],add = T, col = "green",
-     pch = 19, cex = 0.5) #beacon island
+#create colour ramp to represent the values
+colramp <- colorRampPalette(c("#B70101", "#F51616", "#F67A7A",
+                              "#CE9A91", "#98A5B6",
+                              "#806FEC", "#3F3FE4", "#0202A1"))
 
-plot(region_centre[which(region_centre$OBJIDsic == 548),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Coral Sea Islands Territory
 
-plot(region_centre[which(region_centre$OBJIDsic == 552),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Helms Island
+### CONFIRMED ####
 
-plot(region_centre[which(region_centre$OBJIDsic == 553),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Hummock Island
 
-plot(region_centre[which(region_centre$OBJIDsic == 356),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Pearl & Hermes
+#populate the table with the colours to be plotted 
 
-plot(region_centre[which(region_centre$OBJIDsic == 555),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Long Island, Houtman Abrolhos
+col_conf <- confirmed[,-ncol(confirmed)]  #make a copy of the table
 
-plot(region_centre[which(region_centre$OBJIDsic == 577),],add = T, col = "orange",
-     pch = 19, cex = 0.5) #Pigeon Island
+for(i in 2:ncol(col_conf))
+{
+        col_values <- colramp(100)[cut(c(0, 100, col_conf[,i]), breaks = 100)]
+        col_values2 <- col_values[-c(1, 2)] 
+        col_values2[is.na(col_values2)] <- "white" #make NAs grey
+        col_conf[,i] <- col_values2
+}
+
+par(mar=c(6,6,1,3))
+
+#make the empty plot
+plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
+     xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
+
+#decide how many rows and cols the table needs
+rows <- 6
+cols <- 18
+
+#make lines creating a table (cols)
+for(i in 1:(cols-1))
+{
+        a <- c(i*10/cols,i*10/cols,i*10/cols)
+        b <- c(0,5,10)
+        lines(a,b)
+}
+
+#make lines creating a table (rows)
+for(i in 1:(rows-1))
+{
+        a <- c(0,5,10)
+        b <- c(i*10/rows,i*10/rows,i*10/rows)
+        lines(a,b)
+}
+
+#plot squares with colours in the results table
+for(i in 1:rows)
+{
+        for(j in 1:cols)
+        {
+                points((10/cols/2)+(10/cols*(j-1)),
+                       (10/rows/2)+(10/rows*(i-1)),
+                       bg = col_conf[j,i+1],
+                       pch = 22, cex = 5)
+        }
+}
+
+#add axes
+axis(side = 1, 
+     at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
+     labels = confirmed$cont_short, cex.axis = .8, padj = 0, las =2)
+
+
+axis(side = 2, 
+     at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
+     labels = names(confirmed)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(.2,-.060,.9,-.030),
+                 color = colramp(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
+
+
+#populate the table with the colours to be plotted 
+
+col_mod <- modelling[,-ncol(modelling)]  #make a copy of the table
+
+for(i in 2:ncol(col_mod))
+{
+        col_values <- colramp(100)[cut(c(0, 100, col_mod[,i]), breaks = 100)]
+        col_values2 <- col_values[-c(1, 2)] 
+        col_values2[is.na(col_values2)] <- "white" #make NAs grey
+        col_mod[,i] <- col_values2
+}
+
+par(mar=c(6,6,1,3))
+
+#make the empty plot
+plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
+     xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
+
+#decide how many rows and cols the table needs
+rows <- 6
+cols <- 18
+
+#make lines creating a table (cols)
+for(i in 1:(cols-1))
+{
+        a <- c(i*10/cols,i*10/cols,i*10/cols)
+        b <- c(0,5,10)
+        lines(a,b)
+}
+
+#make lines creating a table (rows)
+for(i in 1:(rows-1))
+{
+        a <- c(0,5,10)
+        b <- c(i*10/rows,i*10/rows,i*10/rows)
+        lines(a,b)
+}
+
+#plot squares with colours in the results table
+for(i in 1:rows)
+{
+        for(j in 1:cols)
+        {
+                points((10/cols/2)+(10/cols*(j-1)),
+                       (10/rows/2)+(10/rows*(i-1)),
+                       bg = col_mod[j,i+1],
+                       pch = 22, cex = 5)
+        }
+}
+
+#add axes
+axis(side = 1, 
+     at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
+     labels = modelling$cont_short, cex.axis = .8, padj = 0, las =2)
+
+
+axis(side = 2, 
+     at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
+     labels = names(modelling)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(.2,-.060,.9,-.030),
+                 color = colramp(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
+
+
+#populate the table with the colours to be plotted 
+
+col_rd <- rd[,-ncol(rd)]  #make a copy of the table
+
+for(i in 2:ncol(col_rd))
+{
+        col_values <- colramp(100)[cut(c(0, 100, col_rd[,i]), breaks = 100)]
+        col_values2 <- col_values[-c(1, 2)] 
+        col_values2[is.na(col_values2)] <- "white" #make NAs grey
+        col_rd[,i] <- col_values2
+}
+
+par(mar=c(6,6,1,3))
+
+#make the empty plot
+plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
+     xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
+
+#decide how many rows and cols the table needs
+rows <- 6
+cols <- 18
+
+#make lines creating a table (cols)
+for(i in 1:(cols-1))
+{
+        a <- c(i*10/cols,i*10/cols,i*10/cols)
+        b <- c(0,5,10)
+        lines(a,b)
+}
+
+#make lines creating a table (rows)
+for(i in 1:(rows-1))
+{
+        a <- c(0,5,10)
+        b <- c(i*10/rows,i*10/rows,i*10/rows)
+        lines(a,b)
+}
+
+#plot squares with colours in the results table
+for(i in 1:rows)
+{
+        for(j in 1:cols)
+        {
+                points((10/cols/2)+(10/cols*(j-1)),
+                       (10/rows/2)+(10/rows*(i-1)),
+                       bg = col_rd[j,i+1],
+                       pch = 22, cex = 5)
+        }
+}
+
+#add axes
+axis(side = 1, 
+     at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
+     labels = rd$cont_short, cex.axis = .8, padj = 0, las =2)
+
+
+axis(side = 2, 
+     at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
+     labels = names(rd)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+
+
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(.2,-.060,.9,-.030),
+                 color = colramp(20),
+                 side = 1,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
 
-plot(region_centre[which(region_centre$OBJIDsic == 608),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Seagull Island
-
-plot(region_centre[which(region_centre$OBJIDsic == 619),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Esperance Plains
-
-plot(region_centre[which(region_centre$OBJIDsic == 651),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Bahamas
-
-plot(region_centre[which(region_centre$OBJIDsic == 671),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Trindade e Martim Vaz
-
-plot(region_centre[which(region_centre$OBJIDsic == 712),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Aisen
-
-plot(region_centre[which(region_centre$OBJIDsic == 728),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Capitán Prat
-
-plot(region_centre[which(region_centre$OBJIDsic == 760),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Última Esperanza
-
-plot(region_centre[which(region_centre$OBJIDsic == 816),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Comoros
-
-plot(region_centre[which(region_centre$OBJIDsic == 822),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Cayman Islands
-
-plot(region_centre[which(region_centre$OBJIDsic == 847),],add = T, col = "blue",
-     pch = 19, cex = 0.5) #Crozet Islands
-
-plot(region_centre[which(region_centre$OBJIDsic == 853),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Diego Garcia
-
-plot(region_centre[which(region_centre$OBJIDsic == 874),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Gonave
-
-plot(region_centre[which(region_centre$OBJIDsic == 895),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Lakshadweep
-
-plot(region_centre[which(region_centre$OBJIDsic == 903),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Puducherry
-
-plot(region_centre[which(region_centre$OBJIDsic == 930),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Canton, Phoenix Islands
-
-plot(region_centre[which(region_centre$OBJIDsic == 936),],add = T, col = "orange",
-     pch = 19, cex = 0.5) #Tabueran
-
-plot(region_centre[which(region_centre$OBJIDsic == 987),],add = T, col = "orange",
-     pch = 19, cex = 0.5) #Ailinginae Atoll
-
-plot(region_centre[which(region_centre$OBJIDsic == 988),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Eniwetok, Mashall Islands
-
-plot(region_centre[which(region_centre$OBJIDsic == 1075),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Desertas
-
-plot(region_centre[which(region_centre$OBJIDsic == 1078),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Salvage Islands
-
-plot(region_centre[which(region_centre$OBJIDsic == 1260),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Tonga
-
-plot(region_centre[which(region_centre$OBJIDsic == 1284),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Johnston Island
-
-plot(region_centre[which(region_centre$OBJIDsic == 1340),],add = T, col = "red",
-     pch = 19, cex = 0.5) #Marion Island
-
-plot(region_centre[which(region_centre$OBJIDsic == 1344),],add = T, col = "green",
-     pch = 19, cex = 0.5) #Prince Edward Island, South Africa
-
-plot(region_centre[which(region_centre$OBJIDsic == 1024),],add = T, col = "green",
-     pch = 19, cex = 0.5) #New Caledonia
-
-plot(region_centre[which(region_centre$OBJIDsic == 546),],add = T, col = "orange",
-     pch = 19, cex = 0.5) #Ashmore Reef
-
-y <- over(region_centre[which(region_centre$OBJIDsic == 124),],ipbes)
-
-setwd(wd_results)
-
-test <- read.csv("GloNAF_mesoRegion.csv")
-
-unique(is.na(test$Meso_region))
-
-#identify the GloNAF regions that where not assessed to any IPBES region
-
-nas <- which(is.na(meso$Mes_Rgn))
-na_meso <- table[is.na(meso$Mes_Rgn),]
-
-#solve the regions that were not over any IPBES regions (probably smalls islands)
-
-small <- ipbes[which(ipbes$Are_km2 <= 1000),] #select small regions
-small2 <- gBuffer(small, width = 4, byid = T) #make a buffer
-
-meso2 <- over(region_centre[is.na(meso$Mes_Rgn),],small2)
-
-meso_t <- meso
-meso_t[is.na(meso_t$Mes_Rgn),] <- meso2
-
-table(is.na(meso2$Mes_Rgn))
-
-plot(small2,add=F)
-
-t <- region_centre[nas,]
-plot(t,add=T,col="red",cex=.4,pch=19)
-
-par(mar=c(0,0,0,0))
-plot(ipbes)
-
-head(ipbes@data)
-
-aruba <- ipbes[1,]
-brazil <- ipbes[which(ipbes$Area == "Brazil"),]
-plot(ipbes[-nas],)
-
-area(aruba)/1000000
-
-plot(aruba,add=T,col="red")
-plot(brazil,add=T,col="red")
-
-
-plot(region_centre[nas,],add=F)
-sort(region_centre[nas,]$region)

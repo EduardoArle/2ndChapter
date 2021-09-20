@@ -440,3 +440,348 @@ missing_cont
 #save lookup tabe 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Mammals")
 write.csv(reg_cont,"Lookup_table_region_cont.csv")
+
+
+############## Plants ##########################
+
+
+#list WDs
+wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
+wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
+
+#load shps
+shp_plants <- readOGR("GloNAF_modified",dsn = wd_shp,
+                            use_iconv=TRUE, encoding="UTF-8")
+
+shp_IPBES <- readOGR("IPBES_SubRegion",dsn = wd_IPBES)
+
+#loop though shapefile features to identify each of their continents
+
+pts_regs <- list()
+for(i in 1:nrow(shp_plants))
+{
+  pts_regs[[i]] <- spsample(shp_plants[i,], n=100, type='regular') #seed points in each region
+  print(i)
+}
+
+#get continent of each region
+
+continents <- character()
+
+for(i in 849:nrow(shp_plants))
+{
+  a <- over(pts_regs[[i]],shp_IPBES)
+  b <- table(a$Region)
+  c <- which.max(b)
+  d <- names(c)
+  continents[i] <- d
+  print(i)
+}
+
+### manually fix what does not work
+
+shp_plants[i,]$name
+plot(world)
+plot(pts_regs[[i]],add=T,pch=19,col="red")
+
+plot(world,border = NA)
+plot(shp_IPBES[which(shp_IPBES$Region == "Oceania"),],add=T,
+     border = NA, col = "orange")
+plot(shp_IPBES[which(shp_IPBES$Region == "South-East Asia"),],add=T,
+     border = NA, col = "lightgreen")
+plot(shp_IPBES[which(shp_IPBES$Region == "North-East Asia"),],add=T,
+     border = NA, col = "lightblue")
+plot(shp_IPBES[which(shp_IPBES$Region == "East Africa and adjacent islands"),],add=T,
+     border = NA, col = "yellow")
+plot(shp_IPBES[which(shp_IPBES$Region == "South Asia"),],add=T,
+     border = NA, col = "green")
+plot(shp_IPBES[which(shp_IPBES$Region == "Southern Africa"),],add=T,
+     border = NA, col = "red")
+
+
+#i=19 French Frigate Shoals
+continents[i] <- "Oceania"
+
+#i=27 Ka'ula Rock
+continents[i] <- "Oceania"
+
+#i=42 Nassau, Cook Islands
+continents[i] <- "Oceania"
+
+#i=43 Palmerston, Cook Islands
+continents[i] <- "Oceania"
+
+#i=47 Kure
+continents[i] <- "Oceania"
+
+#i=55 Alexander Island (Australia, not Antarctica)
+continents[i] <- "Oceania"
+
+#i=56 Beacon Island
+continents[i] <- "Oceania"
+
+#i=59 Gilbert Island
+continents[i] <- "Oceania"
+
+#i=60 Gun Island
+continents[i] <- "Oceania"
+
+#i=61 Helms Island
+continents[i] <- "Oceania"
+
+#i=62 Hummock Island
+continents[i] <- "Oceania"
+
+#i=63 Leo Island
+continents[i] <- "Oceania"
+
+#i=82 Fatu Hiva, French Polynesia (Marquesas Islands)
+continents[i] <- "Oceania"
+
+#i=83 Fatu Huku, French Polynesia (Marquesas Islands)
+continents[i] <- "Oceania"
+
+#i=86 Mohotani, French Polynesia (Marquesas Islands)
+continents[i] <- "Oceania"
+
+#i=91 Oeno, French Polynesia
+continents[i] <- "Oceania"
+
+#i=100 Leysan
+continents[i] <- "Oceania"
+
+#i=101 Lehua
+continents[i] <- "Oceania"
+
+#i=103 Lisianski
+continents[i] <- "Oceania"
+
+#i=112 Nihoa
+continents[i] <- "Oceania"
+
+#i=118 Pearl & Hermes
+continents[i] <- "Oceania"
+
+#i=172 Aunuu
+continents[i] <- "Oceania"
+
+#i=173 Long Island, Houtman Abrolhos
+continents[i] <- "Oceania"
+
+#i=174 Little Rat Island
+continents[i] <- "Oceania"
+
+#i=175 Morley Island
+continents[i] <- "Oceania"
+
+#i=176 Middle Island
+continents[i] <- "Oceania"
+
+#i=177 Murray Island
+continents[i] <- "Oceania"
+
+#i=178 Newman Island
+continents[i] <- "Oceania"
+
+#i=179 North Island, Houtman Abrolhos
+continents[i] <- "Oceania"
+
+#i=195 Pigeon Island
+continents[i] <- "Oceania"
+
+#i=211 Rat Island
+continents[i] <- "Oceania"
+
+#i=225 Serventy Island
+continents[i] <- "Oceania"
+
+#i=226 Seagull Island
+continents[i] <- "Oceania"
+
+#i=227 Suomi Island
+continents[i] <- "Oceania"
+
+#i=230 Uncle Margie Island
+continents[i] <- "Oceania"
+
+#i=257 White Island
+continents[i] <- "Oceania"
+
+#i=258 Wooded Island
+continents[i] <- "Oceania"
+
+#i=313 Cocos (Keeling) North Keeling Island
+continents[i] <- "South-East Asia"
+
+#i=382 Suwarrow, Cook Islands
+continents[i] <- "Oceania"
+
+#i=383 Takutea, Cook Islands
+continents[i] <- "Oceania"
+
+#i=403 Aiwa, Lau Islands
+continents[i] <- "Oceania"
+
+#i=405 Nasoata, Fiji Islands
+continents[i] <- "Oceania"
+
+#i=489 McKean, Phoenix Islands
+continents[i] <- "Oceania"
+
+#i=559 McKean, Ailinginae Atoll
+continents[i] <- "Oceania"
+
+#i=614 Salvage Islands
+continents[i] <- "Central and Western Europe"
+
+#i=615 Agakauitai, French Polynesia (Gambier Islands)
+continents[i] <- "Oceania"
+
+#i=616 Maria, French Polynesia (Austral Islands)
+continents[i] <- "Oceania"
+
+#i=624 Aukena, French Polynesia (Gambier Islands)
+continents[i] <- "Oceania"
+
+#i=627 Tauna, French Polynesia (Gambier Islands)
+continents[i] <- "Oceania"
+
+#i=628 Tekava, French Polynesia (Gambier Islands)
+continents[i] <- "Oceania"
+
+#i=630 Tarauru Roa, French Polynesia (Gambier Islands)
+continents[i] <- "Oceania"
+
+#i=638 Mehetia, French Polynesia (Society Islands)
+continents[i] <- "Oceania"
+
+#i=643 Tetiaroa, French Polynesia (Society Islands)
+continents[i] <- "Oceania"
+
+#i=654 Tepoto North, French Polynesia (Tuamotu Archipelago)
+continents[i] <- "Oceania"
+
+#i=661 Demina, Kuril Islands
+continents[i] <- "North-East Asia"
+
+#i=674 Storozhevoy, Kuril Islands
+continents[i] <- "North-East Asia"
+
+#i=717 African Banks, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=720 Aride, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=723 Bird, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=724 Booby Island, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=725 Cocos, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=727 Conception, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=729 Cousin, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=730 Cousine, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=732 Darros, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=733 Denis, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=734 Desroches, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=735 Desnoefs, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=737 Felicite, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=739 Grande Soeur, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=740 Ile au Cerf, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=741 Ile Anonyme, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=742 Ile Longue, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=743 Ile St Anne, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=744 Ile aux Vaches Marines, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=747 Marianne, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=748 Marie-Louise, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=750 Platte, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=753 Providence, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=754 Petit Soeur, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=755 Recifs, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=756 Remire, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=757 St Francois, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=760 St Pierre, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=761 Therese, Seychelles
+continents[i] <- "East Africa and adjacent islands"
+
+#i=812 Fanuatapu
+continents[i] <- "Oceania"
+
+#i=813 Namua
+continents[i] <- "Oceania"
+
+#i=814 Nuulua
+continents[i] <- "Oceania"
+
+#i=815 Nuutela
+continents[i] <- "Oceania"
+
+#i=822 Marion Island
+continents[i] <- "Oceania"
+
+#i=848 Prince Edward Island, South Africa
+continents[i] <- "Southern Africa"
+
+#join info
+reg_cont <- data.frame(Region = shp_plants$name,
+                       OBJIDsic = shp_plants$OBJIDsic,
+                       Continent = continents)
+
+#manually fix regions that have not been asigned to a continent
+missing_cont <- reg_cont[which(is.na(reg_cont$Continent)),]
+
+missing_cont
+
+#save lookup tabe 
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_data")
+write.csv(reg_cont,"Lookup_table_region_cont.csv")

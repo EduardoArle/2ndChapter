@@ -2,80 +2,93 @@ library(plyr);library(rgdal);library(raster);library(data.table)
 library(plotfunctions);library(maptools);library(rworldmap)
 
 #list WDs
-wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
-wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals"
+wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF"
 
 #load shp
-shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
+shp <- readOGR("GloNAF_modified",dsn = wd_shp,
                use_iconv=TRUE, encoding="UTF-8")
 
 #check if all regions listed in the table are represented
 #in the shapefile
 setwd(wd_table)
-sps_reg_list <- read.csv("Alien_mammal_checklist.csv") #load table
-sps_reg_list <- sps_reg_list[,-1]
-regs <- sort(unique(sps_reg_list$Region))
-shp_regs <- sort(unique(shp$BENTITY2_N))
+sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv") #load table
+
+regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv") #table 
+#translating regions ID, names etc
+
+#make a table to include region name and obj ID into the tables
+merge_tab <- regions[,c(1,3,5)]
+
+#include region names and obj ID into the table with occurrence counts
+sps_reg_list2 <- merge(sps_reg_list,merge_tab,by="region_id",sort = F, all.x = T)
+
+#check if all regions in the table are represented in the shp
+regs <- sort(unique(sps_reg_list2$name))
+shp_regs <- sort(unique(shp$name))
 missing <- regs[-which(regs %in% shp_regs)]
 
 missing
 
-#make sps list
-sps_list <- unique(sps_reg_list$Species)
+#fix the inconsistencies between regions in the shapefile and those listed in
+#the master file
+
+#eliminate entries not represented in the shp
+sps_reg_list3 <- sps_reg_list2[-which(sps_reg_list2$name %in% missing),]
+
+#make a sps list
+sps_list <- unique(sps_reg_list3$standardized_name)
 
 #save sps_list
 setwd(wd_table)
-saveRDS(sps_list,"Sps_list_mammals")
+saveRDS(sps_list,"Sps_list_plants")
 
 
 ##### Use taxonomicHarmonisation script and then get occ from cluster
 
-#load table with occurrence counts (calculated by script occRegionFreshwater)
+#load table with occurrence counts (calculated by script occRegionAnts)
 setwd(wd_table)
-sps_reg_count <- readRDS("Mammals_occurrence_region_count")
+sps_reg_count <- readRDS("Plants_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
-                                sps_reg_count$regAntsMammals)
+                                sps_reg_count$Region)
 
 #include the harmonised names into the data base table
 setwd(wd_table)
-harmo <- read.csv("Mammalia_aliens_harmonised.csv")
+harmo <- read.csv("Plants_aliens_harmonised.csv")
 harmo2 <- harmo[,c(1:2)]
 
-sps_reg_list2 <- merge(sps_reg_list,harmo2,
-                       by.x = "Species",
+sps_reg_list4 <- merge(sps_reg_list3,harmo2,
+                       by.x = "standardized_name",
                        by.y = "entry")
 
-#create column with species and region info in the ants table
-sps_reg_list2$sps_reg <- paste0(sps_reg_list2$gbifDarwinCore,"_",
-                                sps_reg_list2$Region)
-
+#create column with species and region info in the plants table
+sps_reg_list4$sps_reg <- paste0(sps_reg_list4$gbifDarwinCore,"_",
+                                sps_reg_list4$OBJIDsic)
 
 #eliminate duplicated rows in the checklists file (probably due to synonyms
 #in the original names that have been resolved)
 
-sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in 
+sps_reg_list5 <- unique(as.data.table(sps_reg_list4), #the table has to be in 
                         by = c("sps_reg"))            #data.table
-
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 
-                                        sps_reg_list3$sps_reg),]
+                                        sps_reg_list5$sps_reg),]
 
 #check which sps_region combination in the taxon table have at least 1 GBIF 
 #occurrence
-sps_reg_list3$confirmed <- as.numeric(sps_reg_list3$sps_reg %in% 
+sps_reg_list5$confirmed <- as.numeric(sps_reg_list5$sps_reg %in% 
                                         sps_reg_count2$sps_reg)
 
 #calculate the percentage of species per regions confirmed by GBIF and
 #the regional species burden
-
-perc_confirmed <- ddply(sps_reg_list3,.(Region),summarise,
+perc_confirmed <- ddply(sps_reg_list5,.(OBJIDsic),summarise,
                         confirmed=mean(confirmed)*100,
-                        n_sps=length(c(Region)))
+                        n_sps=length(c(OBJIDsic)))
 
 #include the number of species and the percentage of species listed confirmed in 
 #the shapefile
@@ -86,7 +99,7 @@ shp2$n_sps <- rep(9999,nrow(shp2))  #include n_species
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_confirmed$Region == shp2$BENTITY2_N[i])
+  a <- which(perc_confirmed$OBJIDsic == shp2$OBJIDsic[i])
   if(length(a) > 0)
   {
     shp2$confirmed[i] <- perc_confirmed$confirmed[a]  
@@ -96,7 +109,6 @@ for(i in 1:nrow(shp2))
     shp2$n_sps[i] <- 0 
   }
 }
-
 
 #####check if there are at least 50 records in the same continent to 
 #model the species occurrence 
@@ -108,16 +120,20 @@ reg_continent <- read.csv("Lookup_table_region_cont.csv")
 reg_continent <- reg_continent[,-1]
 
 #merge continent info into sps_reg_list_rep2
-sps_reg_list4 <- merge(sps_reg_list3,reg_continent,
-                       by = "Region")
+sps_reg_list6 <- merge(sps_reg_list5,reg_continent,
+                       by = "OBJIDsic")
 
-sps_reg_list4$sps_cont <- paste(sps_reg_list4$gbifDarwinCore,
-                                sps_reg_list4$Continent,
+sps_reg_list6$sps_cont <- paste(sps_reg_list6$gbifDarwinCore,
+                                sps_reg_list6$Continent,
                                 sep="_")
 
 #merge continent info into sps_reg_count2
 names(sps_reg_count2)[3] <- "Region"
-sps_reg_count3 <- merge(sps_reg_count2,reg_continent,by="Region")
+
+sps_reg_count3 <- merge(sps_reg_count2,reg_continent,
+                        by.x="Region",
+                        by.y="OBJIDsic")
+
 sps_reg_count3$sps_cont <- paste(sps_reg_count3$species,
                                  sps_reg_count3$Continent,
                                  sep="_")
@@ -128,24 +144,29 @@ sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
 #eliminate rows with less than 50 occurrences
 sps_cont_n2 <- sps_cont_n[which(sps_cont_n$V1 >=50),]
 
-#check which sps_continent combination in the mammals table have at 
+#check which sps_continent combination in the ants table have at 
 #least 50 GBIF occurrence
-sps_reg_list4$modelling <- as.numeric(sps_reg_list4$sps_cont %in% 
+sps_reg_list6$modelling <- as.numeric(sps_reg_list6$sps_cont %in% 
                                         sps_cont_n2$sps_cont)
 
 #calculate the percentage of species per regions having at least 50 records
-perc_modelling <- ddply(sps_reg_list4,.(Region),summarise,
+perc_modelling <- ddply(sps_reg_list6,.(name),summarise,
                         perc_modelling = mean(modelling)*100)
 
 
-#include the number of species and the percentage of species listed confirmed in 
-#the shapefile
+#include the percentage of species with at least 50 records in the continent,
+#and name of continent in the shapefile
 
 shp2$modelling <- rep(9999,nrow(shp2))  #include percentage of sps with 50 recs
+shp2$continent <- rep(9999,nrow(shp2))  #include continent
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(perc_modelling$Region == shp2$BENTITY2_N[i])
+  a <- which(perc_modelling$name == shp2$name[i])
+  b <- which(reg_continent$Region == shp2$name[i])
+  
+  shp2$continent[i] <- reg_continent$Continent[b]
+  
   if(length(a) == 1)
   {
     shp2$modelling[i] <- perc_modelling$perc_modelling[a]  
@@ -178,7 +199,7 @@ sps_reg_count6 <- ddply(sps_reg_count5,.(Region),nrow)
 
 #merge sps number per region to range dynamics value
 tab_rd_n <- merge(sps_reg_count6,shp2@data,
-                  by.x = "Region", by.y = "BENTITY2_N")
+                  by.x = "Region", by.y = "OBJIDsic")
 
 #calculate Rd
 tab_rd_n$Rd <- tab_rd_n$V1/tab_rd_n$n_sps*10
@@ -189,24 +210,24 @@ shp2$Rd <- rep(9999,nrow(shp2))  #include percentage of confirmed sps
 
 for(i in 1:nrow(shp2))
 {
-  a <- which(tab_rd_n$Region == shp2$BENTITY2_N[i])
+  a <- which(tab_rd_n$Region == shp2$OBJIDsic[i])
   if(length(a) == 1)
   {
     shp2$Rd[i] <- tab_rd_n$Rd[a]  
   }else{
-    shp2$Rd[i] <- ifelse(shp2$BENTITY2_N[i] %in% 
-                           sps_reg_list4$Region,0,NA)
+    shp2$Rd[i] <- ifelse(shp2$OBJIDsic[i] %in% 
+                           sps_reg_list6$OBJIDsic,0,NA)
   }
 }
 
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(1,4,3,5,6)]
+table_res2 <- table_res[,c(6,11,8,7,9,10)]
 names(table_res2)[1] <- "Region"
 
-setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Mammals/Tables")
-write.csv(table_res2,"Indices_mammals_region.csv",row.names = F)
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/plants/Tables")
+write.csv(table_res2,"Indices_plants_region.csv",row.names = F)
 
 
 ### plot maps
@@ -223,15 +244,15 @@ w_map <- spTransform(w_map,CRS(proj4string(world)))
 
 #### SOLUTION TO AVOID FIJI AND RUSSIA EAST SCREWING UP THE MAP ####
 
-b <- as(extent(-180, 180, -21, -12.483), 'SpatialPolygons')
-fiji <- crop(shp2[112,],b)
-shp2 <- shp2[-112,]
-shp2 <- spRbind(shp2,fiji)
-
-b2 <- as(extent(-179.998, 179.998, 42.2925, 77.148), 'SpatialPolygons')
-rus_east <- crop(shp2[337,],b2)
-shp2 <- shp2[-337,]
-shp2 <- spRbind(shp2,rus_east)
+# b <- as(extent(-180, 180, -21, -12.483), 'SpatialPolygons')
+# fiji <- crop(shp2[112,],b)
+# shp2 <- shp2[-112,]
+# shp2 <- spRbind(shp2,fiji)
+# 
+# b2 <- as(extent(-179.998, 179.998, 42.2925, 77.148), 'SpatialPolygons')
+# rus_east <- crop(shp2[337,],b2)
+# shp2 <- shp2[-337,]
+# shp2 <- spRbind(shp2,rus_east)
 
 # reproject everythign to Eckert
 worldmapframe <- spTransform(worldmapframe,CRS(proj4string(world)))
@@ -275,6 +296,7 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
                             paste(max(shp3$n_sps))),
                  cex = 1)
 
+
 ##### PLOT THE CONFIRMED MAP
 
 #create vector to populate with the colours
@@ -309,7 +331,6 @@ myGradientLegend(valRange = c(0, 100),
                  n.seg = 0,
                  values = c("0","100%"),
                  cex = 1)
-
 
 ##### PLOT THE MODELLING MAP
 
@@ -381,6 +402,8 @@ myGradientLegend(valRange = c(0, 100),
                  n.seg = 0,
                  values = c("0","100%"),
                  cex = 1)
+
+
 
 
 
