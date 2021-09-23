@@ -65,6 +65,26 @@ setwd(wd_species)
 list <- readRDS("Sps_list_birds")
 
 
+#################### Spiders #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/Spiders"
+
+#read species table
+setwd(wd_species)
+list <- readRDS("Sps_list_spiders")
+
+
+#################### Fungi #################################
+#set path
+wd_species <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi"
+
+#read species table
+setwd(wd_species)
+list <- readRDS("Sps_list_fungi")
+list <- list[-which(list == "")]
+
+
+
 
 ###################### HARMONISATION ######################
 
@@ -101,7 +121,8 @@ for(i in 1:length(list))
 table <- data.frame(entry = list,gbifDarwinCore = gbifDarwinCore,
            otherNames = all_names)
 
-changed_names <- table[table$entry != table$gbifDarwinCore,]
+changed_names <- table[table$entry != table$gbifDarwinCore |
+                         is.na(table$gbifDarwinCore),]
 
 other_names <- table[!is.na(table$otherNames),]
 
@@ -153,5 +174,19 @@ write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/GAVIA")
 
 write.csv(table,"Birds_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+
+
+#### save spiders
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Spiders")
+
+write.csv(table,"Spiders_aliens_harmonised.csv",row.names = F)
+write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
+
+
+#### save fungi
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Fungi")
+
+write.csv(table,"Fungi_aliens_harmonised.csv",row.names = F)
 write.csv(changed_names,"Taxonomic_harmonisasion_differences.csv",row.names = F)
 

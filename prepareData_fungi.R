@@ -1,3 +1,44 @@
+library(plyr);library(rgdal);library(raster);library(data.table)
+library(plotfunctions);library(maptools);library(rworldmap)
+
+#list WDs
+wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi/Shapefile"
+wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi"
+
+#load shp
+shp <- readOGR("Shapefile_fungi",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
+
+#check if all regions listed in the table are represented in the shapefile
+setwd(wd_table)
+sps_reg_list <- read.csv("Table.csv") #load table
+
+#select only the rows for which region could be resolved
+sps_reg_list2 <- sps_reg_list[which(!is.na(sps_reg_list$FungiRegion)),]
+
+#check if all regions in the table are represented in the shp
+regs <- sort(unique(sps_reg_list2$FungiRegion))
+shp_regs <- sort(unique(shp$FungRgn))
+missing <- regs[-which(regs %in% shp_regs)]
+
+missing
+
+#make a sps list
+sps_list <- unique(sps_reg_list2$species)
+
+#save sps_list
+setwd(wd_table)
+saveRDS(sps_list,"Sps_list_fungi")
+
+##### Use taxonomicHarmonisation script and then get occ from cluster
+
+#load table with occurrence counts (calculated by script occRegionSpiders)
+setwd(wd_table)
+sps_reg_count <- readRDS("Fungi_occurrence_region_count")
+
+
+#######################
+
 library(rgdal);library(raster)
 
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi"

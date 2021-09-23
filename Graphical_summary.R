@@ -50,6 +50,11 @@ for(i in 2:length(means))
 confirmed$cont_short <- confirmed$continent
 confirmed$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
+#reorganise rows and columns in the order I want in the figure
+
+confirmed <- confirmed[,c(1,10,7,9,3,5,8,2,6,4)]
+confirmed <- confirmed[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
+
 
 modelling <- means[[1]][,c(1,3)]
 
@@ -65,6 +70,11 @@ for(i in 2:length(means))
 
 modelling$cont_short <- modelling$continent
 modelling$cont_short[c(4,6)] <- c("Western Europe","East Africa")
+
+#reorganise rows and columns in the order I want in the figure
+
+modelling <- modelling[,c(1,10,7,9,3,5,8,2,6,4)]
+modelling <- modelling[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
 
 rd <- means[[1]][,c(1,4)]
@@ -82,6 +92,11 @@ for(i in 2:length(means))
 rd$cont_short <- rd$continent
 rd$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
+#reorganise rows and columns in the order I want in the figure
+
+rd <- rd[,c(1,10,7,9,3,5,8,2,6,4)]
+rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
+
 
 
 ### plot results represented by colour in a table (all in base, bitch)
@@ -97,9 +112,9 @@ colramp <- colorRampPalette(c("#B70101", "#F51616", "#F67A7A",
 
 #populate the table with the colours to be plotted 
 
-col_conf <- confirmed[,-ncol(confirmed)]  #make a copy of the table
+col_conf <- confirmed #make a copy of the table
 
-for(i in 2:ncol(col_conf))
+for(i in 3:ncol(col_conf))
 {
         col_values <- colramp(100)[cut(c(0, 100, col_conf[,i]), breaks = 100)]
         col_values2 <- col_values[-c(1, 2)] 
@@ -114,8 +129,8 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
      xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
 
 #decide how many rows and cols the table needs
-rows <- 6
-cols <- 18
+rows <- length(taxa)
+cols <- nrow(means[[1]])
 
 #make lines creating a table (cols)
 for(i in 1:(cols-1))
@@ -140,7 +155,7 @@ for(i in 1:rows)
         {
                 points((10/cols/2)+(10/cols*(j-1)),
                        (10/rows/2)+(10/rows*(i-1)),
-                       bg = col_conf[j,i+1],
+                       bg = col_conf[j,i+2],
                        pch = 22, cex = 5)
         }
 }
@@ -153,23 +168,23 @@ axis(side = 1,
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(confirmed)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+     labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
 
 
-myGradientLegend(valRange = c(0, 100),
-                 pos=c(.2,-.060,.9,-.030),
-                 color = colramp(20),
-                 side = 1,
-                 n.seg = 0,
-                 values = c("0","100%"),
-                 cex = 1)
+# myGradientLegend(valRange = c(0, 100),
+#                  pos=c(.2,-.060,.9,-.030),
+#                  color = colramp(20),
+#                  side = 1,
+#                  n.seg = 0,
+#                  values = c("0","100%"),
+#                  cex = 1)
 
 
 #populate the table with the colours to be plotted 
 
-col_mod <- modelling[,-ncol(modelling)]  #make a copy of the table
+col_mod <- modelling  #make a copy of the table
 
-for(i in 2:ncol(col_mod))
+for(i in 3:ncol(col_mod))
 {
         col_values <- colramp(100)[cut(c(0, 100, col_mod[,i]), breaks = 100)]
         col_values2 <- col_values[-c(1, 2)] 
@@ -184,8 +199,8 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
      xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
 
 #decide how many rows and cols the table needs
-rows <- 6
-cols <- 18
+rows <- length(taxa)
+cols <- nrow(means[[1]])
 
 #make lines creating a table (cols)
 for(i in 1:(cols-1))
@@ -210,7 +225,7 @@ for(i in 1:rows)
         {
                 points((10/cols/2)+(10/cols*(j-1)),
                        (10/rows/2)+(10/rows*(i-1)),
-                       bg = col_mod[j,i+1],
+                       bg = col_mod[j,i+2],
                        pch = 22, cex = 5)
         }
 }
@@ -218,28 +233,28 @@ for(i in 1:rows)
 #add axes
 axis(side = 1, 
      at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
-     labels = modelling$cont_short, cex.axis = .8, padj = 0, las =2)
+     labels = confirmed$cont_short, cex.axis = .8, padj = 0, las =2)
 
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(modelling)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+     labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
 
 
-myGradientLegend(valRange = c(0, 100),
-                 pos=c(.2,-.060,.9,-.030),
-                 color = colramp(20),
-                 side = 1,
-                 n.seg = 0,
-                 values = c("0","100%"),
-                 cex = 1)
+# myGradientLegend(valRange = c(0, 100),
+#                  pos=c(.2,-.060,.9,-.030),
+#                  color = colramp(20),
+#                  side = 1,
+#                  n.seg = 0,
+#                  values = c("0","100%"),
+#                  cex = 1)
 
 
 #populate the table with the colours to be plotted 
 
-col_rd <- rd[,-ncol(rd)]  #make a copy of the table
+col_rd <- rd  #make a copy of the table
 
-for(i in 2:ncol(col_rd))
+for(i in 3:ncol(col_rd))
 {
         col_values <- colramp(100)[cut(c(0, 100, col_rd[,i]), breaks = 100)]
         col_values2 <- col_values[-c(1, 2)] 
@@ -254,8 +269,8 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
      xaxs = "i",yaxs = "i", axes=F, frame.plot=TRUE)
 
 #decide how many rows and cols the table needs
-rows <- 6
-cols <- 18
+rows <- length(taxa)
+cols <- nrow(means[[1]])
 
 #make lines creating a table (cols)
 for(i in 1:(cols-1))
@@ -280,7 +295,7 @@ for(i in 1:rows)
         {
                 points((10/cols/2)+(10/cols*(j-1)),
                        (10/rows/2)+(10/rows*(i-1)),
-                       bg = col_rd[j,i+1],
+                       bg = col_rd[j,i+2],
                        pch = 22, cex = 5)
         }
 }
@@ -293,7 +308,7 @@ axis(side = 1,
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(rd)[-c(1,8)], cex.axis = 1, padj = 0, las =1)
+     labels = names(rd)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
 
 
 myGradientLegend(valRange = c(0, 100),
