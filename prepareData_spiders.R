@@ -49,7 +49,7 @@ sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
 
 #include the harmonised names into the data base table
 setwd(wd_table)
-harmo <- read.csv("Spiders_aliens_harmonised.csv")
+harmo <- read.csv("Fungi_aliens_harmonised.csv")
 harmo2 <- harmo[,c(1:2)]
 
 sps_reg_list3 <- merge(sps_reg_list2,harmo2,

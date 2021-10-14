@@ -52,7 +52,7 @@ confirmed$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
 #reorganise rows and columns in the order I want in the figure
 
-confirmed <- confirmed[,c(1,10,7,9,3,5,8,2,6,4)]
+confirmed <- confirmed[,c(1,11,6,8,10,3,5,9,2,7,4)]
 confirmed <- confirmed[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
 
@@ -73,7 +73,7 @@ modelling$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
 #reorganise rows and columns in the order I want in the figure
 
-modelling <- modelling[,c(1,10,7,9,3,5,8,2,6,4)]
+modelling <- modelling[,c(1,11,6,8,10,3,5,9,2,7,4)]
 modelling <- modelling[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
 
@@ -94,7 +94,7 @@ rd$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 
 #reorganise rows and columns in the order I want in the figure
 
-rd <- rd[,c(1,10,7,9,3,5,8,2,6,4)]
+rd <- rd[,c(1,11,6,8,10,3,5,9,2,7,4)]
 rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
 
@@ -102,9 +102,8 @@ rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 ### plot results represented by colour in a table (all in base, bitch)
 
 #create colour ramp to represent the values
-colramp <- colorRampPalette(c("#B70101", "#F51616", "#F67A7A",
-                              "#CE9A91", "#98A5B6",
-                              "#806FEC", "#3F3FE4", "#0202A1"))
+colramp <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
+                              "#63009e", "#2a00d6", "#0302fc"))
 
 
 ### CONFIRMED ####
@@ -122,7 +121,7 @@ for(i in 3:ncol(col_conf))
         col_conf[,i] <- col_values2
 }
 
-par(mar=c(6,6,1,3))
+par(mar=c(6,6,1,5))
 
 #make the empty plot
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
@@ -171,13 +170,22 @@ axis(side = 2,
      labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
 
 
-# myGradientLegend(valRange = c(0, 100),
-#                  pos=c(.2,-.060,.9,-.030),
-#                  color = colramp(20),
-#                  side = 1,
-#                  n.seg = 0,
-#                  values = c("0","100%"),
-#                  cex = 1)
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(1.02,.3,1.04,.9),
+                 color = colramp(20),
+                 side = 4,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
+
+
+myGradientLegend(valRange = c(0),
+                 pos=c(1.02,.15,1.04,.19),
+                 color = "white",
+                 side = 4,
+                 n.seg = 0,
+                 values = c("NA"),
+                 cex = 1)
 
 
 #populate the table with the colours to be plotted 
@@ -192,7 +200,7 @@ for(i in 3:ncol(col_mod))
         col_mod[,i] <- col_values2
 }
 
-par(mar=c(6,6,1,3))
+par(mar=c(6,6,1,5))
 
 #make the empty plot
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
@@ -241,13 +249,23 @@ axis(side = 2,
      labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
 
 
-# myGradientLegend(valRange = c(0, 100),
-#                  pos=c(.2,-.060,.9,-.030),
-#                  color = colramp(20),
-#                  side = 1,
-#                  n.seg = 0,
-#                  values = c("0","100%"),
-#                  cex = 1)
+myGradientLegend(valRange = c(0, 100),
+                 pos=c(1.02,.3,1.04,.9),
+                 color = colramp(20),
+                 side = 4,
+                 n.seg = 0,
+                 values = c("0","100%"),
+                 cex = 1)
+
+
+myGradientLegend(valRange = c(0),
+                 pos=c(1.02,.15,1.04,.19),
+                 color = "white",
+                 side = 4,
+                 n.seg = 0,
+                 values = c("NA"),
+                 cex = 1)
+
 
 
 #populate the table with the colours to be plotted 
@@ -262,7 +280,7 @@ for(i in 3:ncol(col_rd))
         col_rd[,i] <- col_values2
 }
 
-par(mar=c(6,6,1,3))
+par(mar=c(6,6,1,5))
 
 #make the empty plot
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10),
@@ -312,10 +330,20 @@ axis(side = 2,
 
 
 myGradientLegend(valRange = c(0, 100),
-                 pos=c(.2,-.060,.9,-.030),
+                 pos=c(1.02,.3,1.04,.9),
                  color = colramp(20),
-                 side = 1,
+                 side = 4,
                  n.seg = 0,
                  values = c("0","100%"),
                  cex = 1)
+
+
+myGradientLegend(valRange = c(0),
+                 pos=c(1.02,.15,1.04,.19),
+                 color = "white",
+                 side = 4,
+                 n.seg = 0,
+                 values = c("NA"),
+                 cex = 1)
+
 
