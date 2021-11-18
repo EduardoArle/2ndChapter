@@ -5,7 +5,8 @@ library(plotfunctions);library(maptools);library(rworldmap)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Simplified_FreshWater_shp"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Data/datatoFigshare"
 wd_freshwater <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater"
-  
+wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+
 #load shp
 shp <- readOGR("Basin042017_3119",dsn = wd_shp,
                use_iconv=TRUE, encoding="UTF-8")
@@ -78,6 +79,10 @@ sps_reg_list4$sps_reg <- paste0(sps_reg_list4$gbifDarwinCore,"_",
 sps_reg_list5 <- unique(as.data.table(sps_reg_list4), #the table has to be in 
                             by = c("sps_reg"))            #data.table
 
+#save final checklist table (harmonised names and no duplicates)
+
+setwd(wd_harmo_cl)
+write.csv(sps_reg_list5,"Final_checklist_freshwater.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 

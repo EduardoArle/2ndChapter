@@ -148,8 +148,13 @@ for(i in 1:nrow(shp_IPBES))
 }
 
 #create colour ramp to represent the values
-colramp <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
+colramp0 <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
                               "#63009e", "#2a00d6", "#0302fc"))
+
+colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
+                              "#fdae61", "#fee08b", "#ffffbf",
+                              "#e6f598", "#abdda4", "#66c2a5",
+                              "#3288bd", "#5e4fa2"))
 
 #populate the table with the colours to be plotted 
 
@@ -210,15 +215,25 @@ icons <- lapply(a,as.raster)
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-amph <- gsub("^.{0,7}","#B60048",icons[[1]])
-ant <- gsub("^.{0,7}","#E1001E",icons[[2]])
-bird <- gsub("^.{0,7}","#6A0096",icons[[3]])
-fresh <- gsub("^.{0,7}","#C90035",icons[[4]])
-fungus <- gsub("^.{0,7}","#E80016",icons[[5]])
-mammal <- gsub("^.{0,7}","#CC0032",icons[[6]])
-plant <- gsub("^.{0,7}","#C3003A",icons[[7]])
-reptile <- gsub("^.{0,7}","#BB0042",icons[[8]])
-spider <- gsub("^.{0,7}","#E80016",icons[[9]])
+amph0 <- gsub("^.{0,7}","#B60048",icons[[1]])
+ant0 <- gsub("^.{0,7}","#E1001E",icons[[2]])
+bird0 <- gsub("^.{0,7}","#6A0096",icons[[3]])
+fresh0 <- gsub("^.{0,7}","#C90035",icons[[4]])
+fungus0 <- gsub("^.{0,7}","#E80016",icons[[5]])
+mammal0 <- gsub("^.{0,7}","#CC0032",icons[[6]])
+plant0 <- gsub("^.{0,7}","#C3003A",icons[[7]])
+reptile0 <- gsub("^.{0,7}","#BB0042",icons[[8]])
+spider0 <- gsub("^.{0,7}","#E80016",icons[[9]])
+
+amph <- gsub("^.{0,7}","#FDB96A",icons[[1]])
+ant <- gsub("^.{0,7}","#E45648",icons[[2]])
+bird <- gsub("^.{0,7}","#ECF7A1",icons[[3]])
+fresh <- gsub("^.{0,7}","#F88F52",icons[[4]])
+fungus <- gsub("^.{0,7}","#D8434D",icons[[5]])
+mammal <- gsub("^.{0,7}","#F7884F",icons[[6]])
+plant <- gsub("^.{0,7}","#FA9C58",icons[[7]])
+reptile <- gsub("^.{0,7}","#FDAF62",icons[[8]])
+spider <- gsub("^.{0,7}","#D8434D",icons[[9]])
 
 ### PLOT
 

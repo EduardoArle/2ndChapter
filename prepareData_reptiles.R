@@ -5,6 +5,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
 wd_rep <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Reptiles"
+wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 
 #load shp
 shp <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
@@ -20,7 +21,7 @@ missing <- regs[-which(regs %in% shp_regs)]
 
 missing
 
-#select only the entries corresponding to amphibians
+#select only the entries corresponding to reptiles
 sps_reg_list_rep <- sps_reg_list[which(sps_reg_list$Group == "Reptilia"),]
 sps_list <- unique(sps_reg_list_rep$Species)
 
@@ -60,6 +61,10 @@ sps_reg_list_rep$sps_reg <- paste0(sps_reg_list_rep$gbifDarwinCore,"_",
 sps_reg_list_rep2 <- unique(as.data.table(sps_reg_list_rep), #the table has to be in 
                         by = c("sps_reg"))            #data.table
 
+#save final checklist table (harmonised names and no duplicates)
+
+setwd(wd_harmo_cl)
+write.csv(sps_reg_list_rep2,"Final_checklist_reptiles.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the reptile table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 

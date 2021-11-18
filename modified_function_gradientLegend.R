@@ -1,3 +1,5 @@
+library(plotfunctions)
+
 myGradientLegend <- function (valRange, color = "terrain", nCol = 30, pos = 0.875, values = NULL,
                               side = 4, dec = NULL, length = 0.25, depth = 0.05, inside = FALSE, 
                               coords = FALSE, pos.num = NULL, n.seg = 1, border.col = "black", 
@@ -198,11 +200,11 @@ myGradientLegend <- function (valRange, color = "terrain", nCol = 30, pos = 0.87
     par <- list(...)
     if ("cex" %in% names(par)) {
       text(x = lab.loc.x, y = lab.loc.y, labels = labels, 
-           col = tick.col, pos = pos.num, xpd = T, ...)
+           col = "black", pos = pos.num, xpd = T, ...)
     }
     else {
       text(x = lab.loc.x, y = lab.loc.y, labels = labels, 
-           col = tick.col, pos = pos.num, cex = min(c(0.8, 
+           col = "black", pos = pos.num, cex = min(c(0.8, 
                                                       cex.f)), xpd = T)
     }
   }

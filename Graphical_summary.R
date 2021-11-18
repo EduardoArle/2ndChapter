@@ -102,9 +102,13 @@ rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 ### plot results represented by colour in a table (all in base, bitch)
 
 #create colour ramp to represent the values
-colramp <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
+colramp0 <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
                               "#63009e", "#2a00d6", "#0302fc"))
 
+colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
+                              "#fdae61", "#fee08b", "#ffffbf",
+                              "#e6f598", "#abdda4", "#66c2a5",
+                              "#3288bd", "#5e4fa2"))
 
 ### CONFIRMED ####
 
@@ -162,8 +166,13 @@ for(i in 1:rows)
 #add axes
 axis(side = 1, 
      at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
-     labels = confirmed$cont_short, cex.axis = .8, padj = 0, las =2)
+     labels = NA, cex.axis = .8, padj = 0, las =2)
 
+#rotate 60 degrees (srt = 60)
+text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
+     par("usr")[3]-0.5, 
+     srt = 45, adj = 1, xpd = TRUE,
+     labels = confirmed$cont_short, cex.axis = .8)
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
@@ -179,13 +188,15 @@ myGradientLegend(valRange = c(0, 100),
                  cex = 1)
 
 
-myGradientLegend(valRange = c(0),
-                 pos=c(1.02,.15,1.04,.19),
+myGradientLegend(valRange = c(0,100),
+                 pos=c(1.02,.15,1.04,.2),
                  color = "white",
                  side = 4,
-                 n.seg = 0,
-                 values = c("NA"),
+                 n.seg = 1,
+                 tick.col = "white",
+                 values = c(NA,"NA",NA),
                  cex = 1)
+
 
 
 #populate the table with the colours to be plotted 

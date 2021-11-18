@@ -4,6 +4,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 #list WDs
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Mammals"
+wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 
 #load shp
 shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
@@ -59,6 +60,11 @@ sps_reg_list2$sps_reg <- paste0(sps_reg_list2$gbifDarwinCore,"_",
 
 sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in 
                         by = c("sps_reg"))            #data.table
+
+#save final checklist table (harmonised names and no duplicates)
+
+setwd(wd_harmo_cl)
+write.csv(sps_reg_list3,"Final_checklist_mammals.csv")
 
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table

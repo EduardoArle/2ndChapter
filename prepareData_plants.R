@@ -4,6 +4,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 #list WDs
 wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF"
+wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 
 #load shp
 shp <- readOGR("GloNAF_modified",dsn = wd_shp,
@@ -74,6 +75,11 @@ sps_reg_list4$sps_reg <- paste0(sps_reg_list4$gbifDarwinCore,"_",
 
 sps_reg_list5 <- unique(as.data.table(sps_reg_list4), #the table has to be in 
                         by = c("sps_reg"))            #data.table
+
+#save final checklist table (harmonised names and no duplicates)
+
+setwd(wd_harmo_cl)
+write.csv(sps_reg_list5,"Final_checklist_plants.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% 

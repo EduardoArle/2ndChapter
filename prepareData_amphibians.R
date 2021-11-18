@@ -5,6 +5,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
 wd_amph <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians"
+wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 
 #load shp
 shp <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
@@ -59,6 +60,10 @@ sps_reg_list_amph$sps_reg <- paste0(sps_reg_list_amph$gbifDarwinCore,"_",
 sps_reg_list_amph2 <- unique(as.data.table(sps_reg_list_amph), #the table has to be in 
                         by = c("sps_reg"))            #data.table
 
+#save final checklist table (harmonised names and no duplicates)
+
+setwd(wd_harmo_cl)
+write.csv(sps_reg_list_amph2,"Final_checklist_amphibians.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the amphibian table
 sps_reg_count2 <- sps_reg_count[which(sps_reg_count$sps_reg %in% sps_reg_list_amph$sps_reg),]
