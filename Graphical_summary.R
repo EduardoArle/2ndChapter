@@ -1,7 +1,8 @@
-library(plyr)
+library(plyr);library(png)
 
 #paths
 wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
+wd_icons <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Figure1/Icons"
 
 #list taxa
 setwd(wd_results)
@@ -110,8 +111,23 @@ colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
                               "#e6f598", "#abdda4", "#66c2a5",
                               "#3288bd", "#5e4fa2"))
 
-### CONFIRMED ####
+#load and name icons
+setwd(wd_icons)
 
+a <- lapply(list.files(),readPNG)
+icons <- lapply(a,as.raster)
+
+amph <- icons[[1]]
+ant <- icons[[2]]
+bird <- icons[[3]]
+fresh <- icons[[4]]
+fungus <- icons[[5]]
+mammal <- icons[[6]]
+plant <- icons[[7]]
+reptile <- icons[[8]]
+spider <- icons[[9]]
+
+### CONFIRMED ####
 
 #populate the table with the colours to be plotted 
 
@@ -170,13 +186,14 @@ axis(side = 1,
 
 #rotate 60 degrees (srt = 60)
 text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
-     par("usr")[3]-0.5, 
+     par("usr")[3]-0.35, 
      srt = 45, adj = 1, xpd = TRUE,
      labels = confirmed$cont_short, cex.axis = .8)
 
+
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
+     labels = NA, cex.axis = 1, padj = 0, las =1)
 
 
 myGradientLegend(valRange = c(0, 100),
@@ -252,12 +269,17 @@ for(i in 1:rows)
 #add axes
 axis(side = 1, 
      at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
-     labels = confirmed$cont_short, cex.axis = .8, padj = 0, las =2)
+     labels = NA, cex.axis = .8, padj = 0, las =2)
 
+#rotate 60 degrees (srt = 60)
+text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
+     par("usr")[3]-0.35, 
+     srt = 45, adj = 1, xpd = TRUE,
+     labels = confirmed$cont_short, cex.axis = .8)
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(confirmed)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
+     labels = NA, cex.axis = 1, padj = 0, las =1)
 
 
 myGradientLegend(valRange = c(0, 100),
@@ -269,12 +291,13 @@ myGradientLegend(valRange = c(0, 100),
                  cex = 1)
 
 
-myGradientLegend(valRange = c(0),
-                 pos=c(1.02,.15,1.04,.19),
+myGradientLegend(valRange = c(0,100),
+                 pos=c(1.02,.15,1.04,.2),
                  color = "white",
                  side = 4,
-                 n.seg = 0,
-                 values = c("NA"),
+                 n.seg = 1,
+                 tick.col = "white",
+                 values = c(NA,"NA",NA),
                  cex = 1)
 
 
@@ -332,12 +355,17 @@ for(i in 1:rows)
 #add axes
 axis(side = 1, 
      at = seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols),
-     labels = rd$cont_short, cex.axis = .8, padj = 0, las =2)
+     labels = NA, cex.axis = .8, padj = 0, las =2)
 
+#rotate 60 degrees (srt = 60)
+text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
+     par("usr")[3]-0.35, 
+     srt = 45, adj = 1, xpd = TRUE,
+     labels = confirmed$cont_short, cex.axis = .8)
 
 axis(side = 2, 
      at = seq(10/rows/2,(10/rows/2)+(10/rows*(rows-1)),by = 10/rows),
-     labels = names(rd)[-c(1,2)], cex.axis = 1, padj = 0, las =1)
+     labels = NA, cex.axis = 1, padj = 0, las =1)
 
 
 myGradientLegend(valRange = c(0, 100),
@@ -349,12 +377,13 @@ myGradientLegend(valRange = c(0, 100),
                  cex = 1)
 
 
-myGradientLegend(valRange = c(0),
-                 pos=c(1.02,.15,1.04,.19),
+myGradientLegend(valRange = c(0,100),
+                 pos=c(1.02,.15,1.04,.2),
                  color = "white",
                  side = 4,
-                 n.seg = 0,
-                 values = c("NA"),
+                 n.seg = 1,
+                 tick.col = "white",
+                 values = c(NA,"NA",NA),
                  cex = 1)
 
 

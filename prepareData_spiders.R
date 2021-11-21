@@ -44,6 +44,12 @@ sps_reg_count <- readRDS("Spiders_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
+names_regs_count <- unique(sps_reg_count$Region)
+
+missing <- names_regs_count[-which(names_regs_count %in% shp_regs)]
+
+missing
+
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$Region)

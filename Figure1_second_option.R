@@ -146,7 +146,7 @@ for(i in 1:nrow(shp_IPBES))
 }
 
 #create colour ramp to represent the values
-colramp <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
+colramp0 <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
                               "#63009e", "#2a00d6", "#0302fc"))
 
 #populate the table with the colours to be plotted 

@@ -1,5 +1,6 @@
 library(data.table);library(plyr);library(rworldmap)
-library(raster);library(rgdal)
+library(raster);library(rgdal);library(rworldxtra)
+library(rgeos)
 
 #prepare data manually to include treaties in the GDP table
 #country name problems, as always
@@ -20,7 +21,7 @@ write.csv(GDP,"Variables.csv",row.names = F)
 
 GDP2 <- GDP[which(!is.na(GDP$interTreaties)),]
 
-world <- getMap()
+world <- getMap(resolution = "high")
 
 world2 <- world[which(world$NAME %in% GDP2$country),]
 
@@ -65,6 +66,11 @@ for(i in 1:nrow(all_countries))
   all_countries$interTreaties[i] <- GDP$interTreaties[a]
 }
 
+#round GDP per capita
+
+all_countries$gdpPerCapita <- 
+  round(as.numeric(all_countries$gdpPerCapita))
+
 ### travel distance variable
 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Correl analyses/access_50k")
@@ -88,8 +94,81 @@ for(i in 1:nrow(all_countries))
   print(i)
 }
 
+#round travel time
+
+all_countries$travelTime <- 
+  round(as.numeric(all_countries$travelTime))
+
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Correl analyses/Shapefile"
 
 writeOGR(all_countries,layer = "Shapefile_variables",
          driver = "ESRI Shapefile",dsn = wd_shp)
 
+##### Import results and calculate average completeness per country
+
+# Import shapefiles
+
+#amphibians
+wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
+shp_amph <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
+               use_iconv=TRUE, encoding="UTF-8")
+
+
+
+### relate shp regions to countries
+reg_count <- list()
+
+for(i in 1:nrow(shp_amph))
+{
+  pts_regs <- spsample(shp_amph[i,], n=1000, type='regular') #seed points in each region
+  a <- over(pts_regs,all_countries)
+  b <- table(a$CountryName)
+  
+  plot(shp_amph[i,])
+  shp_amph[i,]$BENTITY2_N
+  plot(pts_regs,add=T,pch=19,col="magenta")
+  
+  b
+  
+  #make sure that only countries with at least 10% of the region covering are considered
+  c <- b*100/sum(b) 
+  
+  c
+  
+  d <- c[which(c >= 30)]
+  
+  d
+  
+  if(!is.null(names(d))){
+    reg_count[[i]] <- names(d)
+  }else{
+    reg_count[[i]] <- NA
+  }
+  
+  names(reg_count)[i] <- shp_amph[i,]$BENTITY2_N
+  
+  reg_count
+  print(i)
+}
+
+#make a table summarising these relationships
+
+for(i in 1:length(reg_count)){
+  if(i == 1){
+    rel_reg_count <- data.frame(Region = names(reg_count)[i],
+                                Country = reg_count[[i]])
+  }else{
+    a <- data.frame(Region = names(reg_count)[i],
+                              Country = reg_count[[i]])
+    rel_reg_count <- rbind(rel_reg_count,a)
+  }
+}
+
+
+
+######
+wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
+
+setwd(wd_results)
+
+taxa <- list.files()

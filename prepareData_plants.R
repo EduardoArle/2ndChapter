@@ -229,7 +229,7 @@ for(i in 1:nrow(shp2))
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(6,11,8,7,9,10)]
+table_res2 <- table_res[,c(6,10,8,7,9,11)]
 names(table_res2)[1] <- "Region"
 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/plants/Tables")

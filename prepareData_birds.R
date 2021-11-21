@@ -39,6 +39,29 @@ sps_reg_count <- readRDS("Birds_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
+names_regs_count <- unique(sps_reg_count$Region)
+
+missing <- names_regs_count[-which(names_regs_count %in% shp_regs)]
+
+missing
+
+#encoding problem, fix manually
+
+sps_reg_count$Region <- as.character(sps_reg_count$Region)
+  
+sps_reg_count$Region[which(sps_reg_count$Region == "QUÃ‰BEC")] <- "QUÉBEC"
+sps_reg_count$Region[which(sps_reg_count$Region == "Ã…LAND ISLANDS")] <- "ÅLAND ISLANDS"
+sps_reg_count$Region[which(sps_reg_count$Region == "CURAÃ‡AO")] <- "CURAÇAO"
+sps_reg_count$Region[which(sps_reg_count$Region == "SAINT-MARTIN ET SAINT-BARTHÃ‰LÃ‰MY")] <- "SAINT-MARTIN ET SAINT-BARTHÉLÉMY"
+sps_reg_count$Region[which(sps_reg_count$Region == "CÃ´TE D'IVOIRE")] <- "CôTE D'IVOIRE"
+
+names_regs_count <- unique(sps_reg_count$Region)
+
+missing <- names_regs_count[-which(names_regs_count %in% shp_regs)]
+
+missing
+
+
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$Region)

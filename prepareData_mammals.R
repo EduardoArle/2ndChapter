@@ -37,6 +37,12 @@ sps_reg_count <- readRDS("Mammals_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
+names_regs_count <- unique(sps_reg_count$regAntsMammals)
+
+missing <- names_regs_count[-which(names_regs_count %in% shp_regs)]
+
+missing #### EVERYTHING MATCHES!
+
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$regAntsMammals)
@@ -213,7 +219,7 @@ for(i in 1:nrow(shp2))
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(1,7,4,3,5,6)]
+table_res2 <- table_res[,c(1,6,4,3,5,7)]
 names(table_res2)[1] <- "Region"
 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Mammals/Tables")

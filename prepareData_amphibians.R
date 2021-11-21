@@ -37,6 +37,32 @@ sps_reg_count <- readRDS("Amphibia_occurrence_region_count")
 
 names(sps_reg_count)[4] <- "n" #rename species counting column
 
+names_regs_count <- unique(sps_reg_count$BENTITY2_N)
+
+missing <- names_regs_count[-which(names_regs_count %in% shp_regs)]
+
+missing
+
+#encoding problem, fix manually
+
+sps_reg_count$BENTITY2_N <- as.character(sps_reg_count$BENTITY2_N)
+
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N == "San Luis PotosÃ­" )] <- "San Luis Potosí"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "MÃ©xico State" )] <- "México State"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "MichoacÃ¡n" )] <- "Michoacán"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "MÃ©xico Distrito Federal" )] <- "México Distrito Federal"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "Nuevo LeÃ³n" )] <- "Nuevo León"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "QuerÃ©taro" )] <- "Querétaro"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "St.Martin-St.BarthÃ©lÃ©my" )] <- "St.Martin-St.Barthélémy" 
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "Guadalupe I." )] <- "Guadeloupe"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "YucatÃ¡n" )] <- "Yucatán"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "CÃ³rdoba" )] <- "Córdoba"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "Entre RÃ­os" )] <- "Entre Ríos"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "Santa FÃ©" )] <- "Santa Fé"
+sps_reg_count$BENTITY2_N[which(sps_reg_count$BENTITY2_N ==  "TucumÃ¡n" )] <- "Tucumán"
+
+
+
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
                                 sps_reg_count$BENTITY2_N)
@@ -211,7 +237,7 @@ for(i in 1:nrow(shp2))
 #save tables
 
 table_res <- shp2@data
-table_res2 <- table_res[,c(1,7,4,3,5,6)]
+table_res2 <- table_res[,c(1,6,4,3,5,7)]
 names(table_res2)[1] <- "Region"
 
 setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/Amphibians/Tables")
