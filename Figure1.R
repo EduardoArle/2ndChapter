@@ -225,14 +225,14 @@ plant0 <- gsub("^.{0,7}","#C3003A",icons[[7]])
 reptile0 <- gsub("^.{0,7}","#BB0042",icons[[8]])
 spider0 <- gsub("^.{0,7}","#E80016",icons[[9]])
 
-amph <- gsub("^.{0,7}","#FDB96A",icons[[1]])
+amph <- gsub("^.{0,7}","#FDBE6E",icons[[1]])
 ant <- gsub("^.{0,7}","#E45648",icons[[2]])
 bird <- gsub("^.{0,7}","#ECF7A1",icons[[3]])
 fresh <- gsub("^.{0,7}","#F88F52",icons[[4]])
 fungus <- gsub("^.{0,7}","#D8434D",icons[[5]])
 mammal <- gsub("^.{0,7}","#F7884F",icons[[6]])
 plant <- gsub("^.{0,7}","#FA9C58",icons[[7]])
-reptile <- gsub("^.{0,7}","#FDAF62",icons[[8]])
+reptile <- gsub("^.{0,7}","#FDB466",icons[[8]])
 spider <- gsub("^.{0,7}","#D8434D",icons[[9]])
 
 ### PLOT
