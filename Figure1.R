@@ -182,29 +182,43 @@ shp2 <- spTransform(shp_IPBES,CRS(proj4string(world)))
 ################## CALCULATE THE AVERAGE OF EACH INDICATOR
 ################## ACROSS CONTINENTS PER TAXON
 
-res <- t(confirmed[,-c(1,2)])
-conf_taxon <- apply(res,1,mean,na.rm=T)
+results2 <- results
 
-res <- t(modelling[,-c(1,2)])
-model_taxon <- apply(res,1,mean,na.rm=T)
+#include taxon name in each table
+for(i in 1:length(results2))
+{
+  results2[[i]] <- cbind(Taxon=names(results2)[i],results2[[i]])
+}
 
-res <- t(rd[,-c(1,2)])
-rd_taxon <- apply(res,1,mean,na.rm=T)
+#join all results in one table
+results3 <- rbindlist(results2)
 
-means <- cbind(conf_taxon,
-               model_taxon,
-               rd_taxon)
+#calculate average and SD of indicators per taxon
 
-mean_taxon <- data.frame(Taxon = names(conf_taxon),
-                         Mean_indicators = 
-                           apply(means,1,mean))
+means_taxon <- ddply(results3,.(Taxon),
+                  summarise, 
+                  mean_confirmed = mean(confirmed,na.rm=T),
+                  mean_modelling = mean(modelling,na.rm=T),
+                  mean_Rd = mean(Rd,na.rm=T),
+                  entries = sum(n_sps))
 
 #populate the table with the colours to be plotted 
 
-colours <- colramp(100)[cut(c(0,100,mean_taxon$Mean_indicators), 
+colours_conf <- colramp(100)[cut(c(0,100,means_taxon$mean_confirmed), 
                             breaks = 100)][-c(1,2)]
 
-mean_taxon$Colour <- colours
+means_taxon$col_conf <- colours_conf
+
+
+colours_mod <- colramp(100)[cut(c(0,100,means_taxon$mean_modelling), 
+                                 breaks = 100)][-c(1,2)]
+
+means_taxon$col_mod <- colours_mod
+
+colours_rd <- colramp(100)[cut(c(0,100,means_taxon$mean_Rd), 
+                                breaks = 100)][-c(1,2)]
+
+means_taxon$col_Rd <- colours_rd
 
 #load icons
 setwd(wd_icons)
@@ -214,16 +228,6 @@ icons <- lapply(a,as.raster)
 
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
-
-amph0 <- gsub("^.{0,7}","#B60048",icons[[1]])
-ant0 <- gsub("^.{0,7}","#E1001E",icons[[2]])
-bird0 <- gsub("^.{0,7}","#6A0096",icons[[3]])
-fresh0 <- gsub("^.{0,7}","#C90035",icons[[4]])
-fungus0 <- gsub("^.{0,7}","#E80016",icons[[5]])
-mammal0 <- gsub("^.{0,7}","#CC0032",icons[[6]])
-plant0 <- gsub("^.{0,7}","#C3003A",icons[[7]])
-reptile0 <- gsub("^.{0,7}","#BB0042",icons[[8]])
-spider0 <- gsub("^.{0,7}","#E80016",icons[[9]])
 
 amph <- gsub("^.{0,7}","#FDBE6E",icons[[1]])
 ant <- gsub("^.{0,7}","#E45648",icons[[2]])

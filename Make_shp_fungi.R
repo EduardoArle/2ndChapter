@@ -3,6 +3,7 @@ library(rgdal);library(raster);library(maptools);library(rgeos);
 library(rworldmap)
 
 #list wds
+wd_data_fungi <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi"
 wd_shp_ants <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
 wd_GRIIS_shp <- "C:/Users/ca13kute/Documents/sTWIST/GRIIS_shp" 
 wd_shp_australia <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi/Shp_stuff/AUS_adm"

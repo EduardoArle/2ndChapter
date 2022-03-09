@@ -180,31 +180,43 @@ shp2 <- spTransform(shp_IPBES,CRS(proj4string(world)))
 ################## CALCULATE THE AVERAGE OF EACH INDICATOR
 ################## ACROSS CONTINENTS PER TAXON
 
-res <- t(confirmed[,-c(1,2)])
-conf_taxon <- apply(res,1,mean,na.rm=T)
+results2 <- results
 
-res <- t(modelling[,-c(1,2)])
-model_taxon <- apply(res,1,mean,na.rm=T)
+#include taxon name in each table
+for(i in 1:length(results2))
+{
+  results2[[i]] <- cbind(Taxon=names(results2)[i],results2[[i]])
+}
 
-res <- t(rd[,-c(1,2)])
-rd_taxon <- apply(res,1,mean,na.rm=T)
+#join all results in one table
+results3 <- rbindlist(results2)
 
-means <- as.data.frame(cbind(conf_taxon,
-               model_taxon,
-               rd_taxon))
+#calculate average and SD of indicators per taxon
+
+means_taxon <- ddply(results3,.(Taxon),
+                     summarise, 
+                     mean_confirmed = mean(confirmed,na.rm=T),
+                     mean_modelling = mean(modelling,na.rm=T),
+                     mean_Rd = mean(Rd,na.rm=T),
+                     entries = sum(n_sps))
 
 #populate the table with the colours to be plotted 
 
-col_tax_c <- colramp(100)[cut(c(0,100,means$conf_taxon), 
-                            breaks = 100)][-c(1,2)]
+colours_conf <- colramp(100)[cut(c(0,100,means_taxon$mean_confirmed), 
+                                 breaks = 100)][-c(1,2)]
 
-col_tax_m <- colramp(100)[cut(c(0,100,means$model_taxon), 
-                              breaks = 100)][-c(1,2)]
+means_taxon$col_conf <- colours_conf
 
-col_tax_rd <- colramp(100)[cut(c(0,100,means$rd_taxon), 
-                              breaks = 100)][-c(1,2)]
 
-means <- cbind(means,col_tax_c,col_tax_m,col_tax_rd)
+colours_mod <- colramp(100)[cut(c(0,100,means_taxon$mean_modelling), 
+                                breaks = 100)][-c(1,2)]
+
+means_taxon$col_mod <- colours_mod
+
+colours_rd <- colramp(100)[cut(c(0,100,means_taxon$mean_Rd), 
+                               breaks = 100)][-c(1,2)]
+
+means_taxon$col_Rd <- colours_rd
 
 #load icons
 setwd(wd_icons)
@@ -217,17 +229,17 @@ icons <- lapply(a,as.raster)
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means 
+means_taxon
 
-amph <- gsub("^.{0,7}","#5800A8",icons[[1]])
-ant <- gsub("^.{0,7}","#B0004D",icons[[2]])
-bird <- gsub("^.{0,7}","#2600D9",icons[[3]])
-fresh <- gsub("^.{0,7}","#90006E",icons[[4]])
-fungus <- gsub("^.{0,7}","#C90035",icons[[5]])
-mammal <- gsub("^.{0,7}","#6D0092",icons[[6]])
-plant <- gsub("^.{0,7}","#860078",icons[[7]])
-reptile <- gsub("^.{0,7}","#5B00A5",icons[[8]])
-spider <- gsub("^.{0,7}","#C90035",icons[[9]])
+amph <- gsub("^.{0,7}","#6EC5A4",icons[[1]])
+ant <- gsub("^.{0,7}","#FDD27F",icons[[2]])
+bird <- gsub("^.{0,7}","#429AB5",icons[[3]])
+fresh <- gsub("^.{0,7}","#FEFAB7",icons[[4]])
+fungus <- gsub("^.{0,7}","#FDD784",icons[[5]])
+mammal <- gsub("^.{0,7}","#D6EE9B",icons[[6]])
+plant <- gsub("^.{0,7}","#FEFAB7",icons[[7]])
+reptile <- gsub("^.{0,7}","#83CDA4",icons[[8]])
+spider <- gsub("^.{0,7}","#FDBE6E",icons[[9]])
 
 ### PLOT
 
@@ -261,17 +273,17 @@ rasterImage(fungus,-11000000,-4400000,-9200000,-2800000) #freshwater
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means 
+means_taxon
 
-amph <- gsub("^.{0,7}","#C1003D",icons[[1]])
-ant <- gsub("^.{0,7}","#E80016",icons[[2]])
-bird <- gsub("^.{0,7}","#5500AB",icons[[3]])
-fresh <- gsub("^.{0,7}","#C1003D",icons[[4]])
-fungus <- gsub("^.{0,7}","#EE0010",icons[[5]])
-mammal <- gsub("^.{0,7}","#E60018",icons[[6]])
-plant <- gsub("^.{0,7}","#B60048",icons[[7]])
-reptile <- gsub("^.{0,7}","#CC0032",icons[[8]])
-spider <- gsub("^.{0,7}","#F0000F",icons[[9]])
+amph <- gsub("^.{0,7}","#FEEA9C",icons[[1]])
+ant <- gsub("^.{0,7}","#F57446",icons[[2]])
+bird <- gsub("^.{0,7}","#8AD0A4",icons[[3]])
+fresh <- gsub("^.{0,7}","#E2F398",icons[[4]])
+fungus <- gsub("^.{0,7}","#F88F52",icons[[5]])
+mammal <- gsub("^.{0,7}","#FA9C58",icons[[6]])
+plant <- gsub("^.{0,7}","#F8FCB5",icons[[7]])
+reptile <- gsub("^.{0,7}","#FEF0A7",icons[[8]])
+spider <- gsub("^.{0,7}","#F16943",icons[[9]])
 
 ### PLOT
 
@@ -305,17 +317,17 @@ rasterImage(fungus,-11000000,-4400000,-9200000,-2800000) #freshwater
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means 
+means_taxon
 
-amph <- gsub("^.{0,7}","#F2000D",icons[[1]])
-ant <- gsub("^.{0,7}","#FE0002",icons[[2]])
-bird <- gsub("^.{0,7}","#C60037",icons[[3]])
-fresh <- gsub("^.{0,7}","#FC0003",icons[[4]])
-fungus <- gsub("^.{0,7}","#FE0002",icons[[5]])
-mammal <- gsub("^.{0,7}","#F60009",icons[[6]])
-plant <- gsub("^.{0,7}","#FC0003",icons[[7]])
-reptile <- gsub("^.{0,7}","#F80007",icons[[8]])
-spider <- gsub("^.{0,7}","#FE0002",icons[[9]])
+amph <- gsub("^.{0,7}","#CA324C",icons[[1]])
+ant <- gsub("^.{0,7}","#9E0142",icons[[2]])
+bird <- gsub("^.{0,7}","#FDB466",icons[[3]])
+fresh <- gsub("^.{0,7}","#A90D44",icons[[4]])
+fungus <- gsub("^.{0,7}","#A30743",icons[[5]])
+mammal <- gsub("^.{0,7}","#C42C4B",icons[[6]])
+plant <- gsub("^.{0,7}","#A30743",icons[[7]])
+reptile <- gsub("^.{0,7}","#B91F48",icons[[8]])
+spider <- gsub("^.{0,7}","#9E0142",icons[[9]])
 
 ### PLOT
 
