@@ -5,6 +5,7 @@ library(plotfunctions);library(maptools);library(rworldmap)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants"
 wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 
 #load shp
 shp <- readOGR("Bentity2_shapefile_fullres",dsn = wd_shp,
@@ -138,6 +139,10 @@ sps_reg_list4 <- merge(sps_reg_list3,reg_continent,
 sps_reg_list4$sps_cont <- paste(sps_reg_list4$gbifDarwinCore,
                                 sps_reg_list4$Continent,
                                 sep="_")
+#save checklist table with continent info to calculate the burder
+setwd(wd_cont_burden)
+
+write.csv(sps_reg_list4,"Ants_continent.csv",row.names = F)
 
 #merge continent info into sps_reg_count2
 names(sps_reg_count2)[3] <- "Region"

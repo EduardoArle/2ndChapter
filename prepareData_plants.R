@@ -133,6 +133,12 @@ sps_reg_list6$sps_cont <- paste(sps_reg_list6$gbifDarwinCore,
                                 sps_reg_list6$Continent,
                                 sep="_")
 
+#save checklist table with continent info to calculate the burder
+setwd(wd_cont_burden)
+
+write.csv(sps_reg_list6,"Plants_continent.csv",row.names = F)
+
+
 #merge continent info into sps_reg_count2
 names(sps_reg_count2)[3] <- "Region"
 

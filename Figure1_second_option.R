@@ -1,16 +1,45 @@
 library(plyr);library(raster);library(rgdal);library(plotfunctions)
-library(png)
+library(png);library(data.table)
 
 #paths
 wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
 wd_icons <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Figure1/Icons"
+wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 
 #list taxa
 setwd(wd_results)
 taxa <- list.files()
 
-#load results for all taxa
+#load species/continent relations for all taxa
+setwd(wd_cont_burden)
+sps_cont <- lapply(list.files(),read.csv)
+names(sps_cont) <- gsub("_continent.csv","",list.files())
+
+#mantain only one row per sps-cont combinations
+sps_cont_unique <- lapply(sps_cont,function(x){
+  unique(as.data.table(x),by="sps_cont")
+})
+
+#count species listed per continent
+sps_per_cont <- lapply(sps_cont_unique,function(x){
+  ddply(x,.(Continent),nrow)
+})
+
+#rename the column with the counts per cont with the taxon name
+for(i in 1:length(sps_per_cont))
+{
+  names(sps_per_cont[[i]])[2] <- names(sps_per_cont)[[i]]
+}
+
+#merge tables for each taxon
+sps_per_cont2 <- sps_per_cont[[1]]
+for(i in 1:(length(sps_per_cont)-1))
+{
+  sps_per_cont2 <- merge(sps_per_cont2,sps_per_cont[[i+1]],all=T)
+}
+
+#load indicator results for all taxa
 results <- list()
 
 for(i in 1:length(taxa))
@@ -121,20 +150,27 @@ res <- rd[,-c(1,2)]
 
 rd_continent$average <- apply(res,1,mean,na.rm=T)
 
+# species burden per cont
+sps_per_cont2$Total <- apply(sps_per_cont2[,-1], 1,
+                             function(x) sum(x, na.rm = T))
 
 ##### plot big map
 
 #load IPBES sub region map
 shp_IPBES <- readOGR("IPBES_SubRegion",dsn = wd_IPBES)
 
-#include calculated average in the shp
+#include sps burden and calculated average in the shp
+shp_IPBES$burden <- rep(9999,nrow(shp_IPBES))
 shp_IPBES$confirmed <- rep(9999,nrow(shp_IPBES))
 shp_IPBES$modelling <- rep(9999,nrow(shp_IPBES))
 shp_IPBES$rd <- rep(9999,nrow(shp_IPBES))
 
-  
+
 for(i in 1:nrow(shp_IPBES))
 {
+  a <- which(sps_per_cont2$Continent == shp_IPBES$Region[i])
+  shp_IPBES$burden[i] <- sps_per_cont2$Total[a]
+   
   a <- which(conf_continent$continent == shp_IPBES$Region[i])
   shp_IPBES$confirmed[i] <- conf_continent$average[a]  
   
@@ -146,19 +182,28 @@ for(i in 1:nrow(shp_IPBES))
 }
 
 #create colour ramp to represent the values
-colramp0 <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
-                              "#63009e", "#2a00d6", "#0302fc"))
+colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
+                              "#fdae61", "#fee08b", "#ffffbf",
+                              "#e6f598", "#abdda4", "#66c2a5",
+                              "#3288bd", "#5e4fa2"))
 
 #populate the table with the colours to be plotted 
 
+col_burden <- colramp(100)[cut(log(shp_IPBES$burden), 
+                               breaks = 100)]
+shp_IPBES$col_burden <- col_burden
+
 col_conf <- colramp(100)[cut(c(0,100,shp_IPBES$confirmed), 
                             breaks = 100)][-c(1,2)]
+shp_IPBES$col_conf <- col_conf
 
 col_model <- colramp(100)[cut(c(0,100,shp_IPBES$modelling), 
                              breaks = 100)][-c(1,2)]
+shp_IPBES$col_model <- col_model
 
 col_rd <- colramp(100)[cut(c(0,100,shp_IPBES$rd), 
                               breaks = 100)][-c(1,2)]
+shp_IPBES$col_rd <- col_rd
 
 
 #plot map
@@ -200,7 +245,14 @@ means_taxon <- ddply(results3,.(Taxon),
                      mean_Rd = mean(Rd,na.rm=T),
                      entries = sum(n_sps))
 
+means_taxon$species <- c(76,282,458,601,595,221,12704,197,267)
+
 #populate the table with the colours to be plotted 
+
+colours_burden <- colramp(100)[cut(log(means_taxon$species), 
+                                   breaks = 100)]
+
+means_taxon$col_burden <- colours_burden
 
 colours_conf <- colramp(100)[cut(c(0,100,means_taxon$mean_confirmed), 
                                  breaks = 100)][-c(1,2)]
@@ -223,6 +275,76 @@ setwd(wd_icons)
 
 a <- lapply(list.files(),readPNG)
 icons <- lapply(a,as.raster)
+
+###### BURDEN (plot in log scale)
+
+#manually changing the HEX values before the transparency to
+#the colours selected to plot each taxon icon
+
+means_taxon[,c(1,7)]
+
+amph <- gsub("^.{0,7}","#9E0142",icons[[1]])
+ant <- gsub("^.{0,7}","#F88F52",icons[[2]])
+bird <- gsub("^.{0,7}","#FDC877",icons[[3]])
+fresh <- gsub("^.{0,7}","#FEE18D",icons[[4]])
+fungus <- gsub("^.{0,7}","#FEE18D",icons[[5]])
+mammal <- gsub("^.{0,7}","#F46E43",icons[[6]])
+plant <- gsub("^.{0,7}","#5E4FA2",icons[[7]])
+reptile <- gsub("^.{0,7}","#EE6445",icons[[8]])
+spider <- gsub("^.{0,7}","#F7884F",icons[[9]])
+
+### PLOT
+
+par(mar=c(2,2,2,2))
+plot(shp2,border=NA,col=shp_IPBES$col_burden)
+plot(worldmapframe,add=T)
+
+myGradientLegend(valRange = c(min(shp_IPBES$burden), max(shp_IPBES$burden)), 
+                 pos=c(0.3,0,0.7,.015),
+                 color = colramp(100), 
+                 side = 1,
+                 n.seg = c(min(shp_IPBES$burden),
+                           max(shp_IPBES$burden)/4,
+                           max(shp_IPBES$burden)/2,
+                           max(shp_IPBES$burden)*3/4,
+                           max(shp_IPBES$burden)),
+                 values = c(paste(round(exp(log(min(shp_IPBES$burden))))),
+                            paste(round(exp(log(max(shp_IPBES$burden))/4))),
+                            paste(round(exp(log(max(shp_IPBES$burden))/2))),
+                            paste(round(exp(log(max(shp_IPBES$burden))*3/4))),
+                            paste(max(shp_IPBES$burden))),
+                 cex = 1)
+
+## draw box
+rect(-17500000,-7600000,-9000000,1500000, col = "white")
+
+#plot icons
+rasterImage(bird,-17100000,-1500000,-14700000,1150000) #bird
+rasterImage(mammal,-14200000,-1000000,-12500000,1100000) #mammal
+rasterImage(amph,-12100000,-1250000,-9200000,950000) #amphibian
+rasterImage(reptile,-16700000,-3100000,-14900000,-1600000) #reptile
+rasterImage(fresh,-14200000,-3680000,-12400000,-1120000) #freshwater
+rasterImage(ant,-12100000,-3350000,-9200000,-1270000) #ants
+rasterImage(spider,-17500000,-6400000,-14200000,-2950000) #spiders
+rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #freshwater
+rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #freshwater
+
+myGradientLegend(valRange = c(min(means_taxon$species),
+                              max(means_taxon$species)), 
+                 pos=c(0.17,0.16,0.31,.169),
+                 color = colramp(100), 
+                 side = 1,
+                 n.seg = c(min(means_taxon$species),
+                           max(means_taxon$species)/4,
+                           max(means_taxon$species)/2,
+                           max(means_taxon$species)*3/4,
+                           max(means_taxon$species)),
+                 values = c(paste(round(exp(log(min(means_taxon$species))))),
+                            paste(round(exp(log(max(means_taxon$species))/4))),
+                            paste(round(exp(log(max(means_taxon$species))/2))),
+                            paste(round(exp(log(max(means_taxon$species))*3/4))),
+                            paste(max(means_taxon$species))),
+                 cex = 1)
 
 ###### CONFIRMED
 

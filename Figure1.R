@@ -1,5 +1,5 @@
 library(plyr);library(raster);library(rgdal);library(plotfunctions)
-library(png)
+library(png);library(data.table)
 
 #paths
 wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"

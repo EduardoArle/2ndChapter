@@ -33,7 +33,6 @@ unresolved <- numeric()
 resolved <- numeric()
 name_changes <- numeric()
 
-#####  INCLUDE CALCULATIONS not to species level #####
 
 for(i in 1:length(results_taxa))
 {
@@ -41,25 +40,37 @@ for(i in 1:length(results_taxa))
   entries[[i]] <- nrow(results_taxa[[i]])
   
   #count unresolved names
-  unresolved[[i]] <- length(which(
-    is.na(results_taxa[[i]]$gbifDarwinCore)))
+  a <- which(is.na(results_taxa[[i]]$gbifDarwinCore))
+  b <- which(results_taxa[[i]]$gbifDarwinCore == "not to species level")
+  unresolved[[i]] <- length(a) + length(b)
   
   #count unique resolved names
-  resolved[[i]] <- length(unique(results_taxa[[i]]$gbifDarwinCore))
-  resolved[[i]] <- ifelse(unresolved[[i]] > 0,
-                          resolved[[i]] - 1,resolved[[i]])
+  res <- results_taxa[[i]][which(
+              !is.na(results_taxa[[i]]$gbifDarwinCore)),]
+  res2 <- res[which(res$gbifDarwinCore != "not to species level"),]
+  resolved[[i]] <- length(unique(res2$gbifDarwinCore))
   
   #count how many entries changed
-  name_changes[[i]] <- length(which(results_taxa[[i]]$entry != 
-                                      results_taxa[[i]]$gbifDarwinCore)) 
+  name_changes[[i]] <- length(which(res2$entry != res2$gbifDarwinCore)) 
 }
 
+harmonised <- data.frame(Taxon = names(taxa),
+                         Entries = entries,
+                         Unresolved = unresolved,
+                         Hamonised_species_names = resolved,
+                         Name_chages = name_changes)
 
+
+setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Extended data")
+
+write.csv(harmonised,"Ext_data_table1.csv",row.names = F)
+
+############################# SCRAP #########################
 
 a <- which(duplicated(results_taxa[[i]]$gbifDarwinCore))
 
 b <- results_taxa[[i]]$gbifDarwinCore[a]
 
-c <- which(results_taxa[[i]]$gbifDarwinCore == b)
+c <- which(results_taxa[[i]]$gbifDarwinCore %in% b)
 
 results_taxa[[i]][c,]

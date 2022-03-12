@@ -6,6 +6,7 @@ wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regio
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
 wd_amph <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians"
 wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 
 #load shp
 shp <- readOGR("Regions_reptiles_amphibians",dsn = wd_shp,
@@ -143,6 +144,11 @@ sps_reg_list_amph3 <- merge(sps_reg_list_amph2,reg_continent,by="Region")
 sps_reg_list_amph3$sps_cont <- paste(sps_reg_list_amph3$gbifDarwinCore,
                                       sps_reg_list_amph3$Continent,
                                      sep="_")
+
+#save checklist table with continent info to calculate the burder
+setwd(wd_cont_burden)
+
+write.csv(sps_reg_list_amph3,"Amphibians_continent.csv",row.names = F)
 
 #merge continent info into sps_reg_count2
 names(sps_reg_count2)[3] <- "Region"
