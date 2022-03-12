@@ -1,6 +1,9 @@
 library(plyr);library(raster);library(rgdal);library(plotfunctions)
 library(png);library(data.table)
 
+#### THE FUNCTION 'modified_function_gradientLegend' needs to be installed
+#### to plot the maps' legends
+
 #paths
 wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
@@ -299,8 +302,9 @@ par(mar=c(2,2,2,2))
 plot(shp2,border=NA,col=shp_IPBES$col_burden)
 plot(worldmapframe,add=T)
 
+#plot map legend
 myGradientLegend(valRange = c(min(shp_IPBES$burden), max(shp_IPBES$burden)), 
-                 pos=c(0.3,0,0.7,.015),
+                 pos=c(0.23,0,0.78,.017),
                  color = colramp(100), 
                  side = 1,
                  n.seg = c(min(shp_IPBES$burden),
@@ -313,7 +317,7 @@ myGradientLegend(valRange = c(min(shp_IPBES$burden), max(shp_IPBES$burden)),
                             paste(round(exp(log(max(shp_IPBES$burden))/2))),
                             paste(round(exp(log(max(shp_IPBES$burden))*3/4))),
                             paste(max(shp_IPBES$burden))),
-                 cex = 1)
+                 cex = 1.3)
 
 ## draw box
 rect(-17500000,-7600000,-9000000,1500000, col = "white")
@@ -326,12 +330,13 @@ rasterImage(reptile,-16700000,-3100000,-14900000,-1600000) #reptile
 rasterImage(fresh,-14200000,-3680000,-12400000,-1120000) #freshwater
 rasterImage(ant,-12100000,-3350000,-9200000,-1270000) #ants
 rasterImage(spider,-17500000,-6400000,-14200000,-2950000) #spiders
-rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #freshwater
-rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #freshwater
+rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #plants
+rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
+#plot icons legend
 myGradientLegend(valRange = c(min(means_taxon$species),
                               max(means_taxon$species)), 
-                 pos=c(0.17,0.16,0.31,.169),
+                 pos=c(0.04,0.16,0.235,.169),
                  color = colramp(100), 
                  side = 1,
                  n.seg = c(min(means_taxon$species),
@@ -344,14 +349,14 @@ myGradientLegend(valRange = c(min(means_taxon$species),
                             paste(round(exp(log(max(means_taxon$species))/2))),
                             paste(round(exp(log(max(means_taxon$species))*3/4))),
                             paste(max(means_taxon$species))),
-                 cex = 1)
+                 cex = 1.3)
 
 ###### CONFIRMED
 
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon
+means_taxon$col_conf
 
 amph <- gsub("^.{0,7}","#6EC5A4",icons[[1]])
 ant <- gsub("^.{0,7}","#FDD27F",icons[[2]])
@@ -366,36 +371,47 @@ spider <- gsub("^.{0,7}","#FDBE6E",icons[[9]])
 ### PLOT
 
 par(mar=c(2,2,2,2))
-plot(shp2,border=NA,col=col_conf)
+plot(shp2,border=NA,col=shp_IPBES$col_conf)
 plot(worldmapframe,add=T)
 
-
+#plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.3,0,0.7,.015),
+                 pos=c(0.23,0,0.78,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1)
+                 cex = 1.3)
 
+## draw box
+rect(-17500000,-7600000,-9000000,1500000, col = "white")
 
-rasterImage(bird,-13400000,-2050000,-12100000,-500000) #bird
-rasterImage(mammal,-12000000,-1800000,-11000000,-550000) #mammal
-rasterImage(amph,-11000000,-1950000,-9200000,-700000) #amphibian
-rasterImage(reptile,-13300000,-2900000,-12200000,-2000000) #reptile
-rasterImage(fresh,-11950000,-3150000,-10950000,-1750000) #freshwater
-rasterImage(ant,-11000000,-3050000,-9200000,-1750000) #freshwater
-rasterImage(spider,-13700000,-4700000,-11800000,-2750000) #freshwater
-rasterImage(plant,-11900000,-4190000,-11000000,-3150000) #freshwater
-rasterImage(fungus,-11000000,-4400000,-9200000,-2800000) #freshwater
+#plot icons
+rasterImage(bird,-17100000,-1500000,-14700000,1150000) #bird
+rasterImage(mammal,-14200000,-1000000,-12500000,1100000) #mammal
+rasterImage(amph,-12100000,-1250000,-9200000,950000) #amphibian
+rasterImage(reptile,-16700000,-3100000,-14900000,-1600000) #reptile
+rasterImage(fresh,-14200000,-3680000,-12400000,-1120000) #freshwater
+rasterImage(ant,-12100000,-3350000,-9200000,-1270000) #ants
+rasterImage(spider,-17500000,-6400000,-14200000,-2950000) #spiders
+rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #plants
+rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
+#plot icons legend
+myGradientLegend(valRange = c(0, 50, 100),
+                 pos=c(0.04,0.16,0.235,.169),
+                 color = colramp(100),
+                 side = 1,
+                 n.seg = 1,
+                 values = c("0","50","100%"),
+                 cex = 1.3)
 
 ###### MODELLING
 
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon
+means_taxon$col_mod
 
 amph <- gsub("^.{0,7}","#FEEA9C",icons[[1]])
 ant <- gsub("^.{0,7}","#F57446",icons[[2]])
@@ -410,36 +426,47 @@ spider <- gsub("^.{0,7}","#F16943",icons[[9]])
 ### PLOT
 
 par(mar=c(2,2,2,2))
-plot(shp2,border=NA,col=col_model)
+plot(shp2,border=NA,col=shp_IPBES$col_model)
 plot(worldmapframe,add=T)
 
-
+#plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.3,0,0.7,.015),
+                 pos=c(0.23,0,0.78,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1)
+                 cex = 1.3)
 
+## draw box
+rect(-17500000,-7600000,-9000000,1500000, col = "white")
 
-rasterImage(bird,-13400000,-2050000,-12100000,-500000) #bird
-rasterImage(mammal,-12000000,-1800000,-11000000,-550000) #mammal
-rasterImage(amph,-11000000,-1950000,-9200000,-700000) #amphibian
-rasterImage(reptile,-13300000,-2900000,-12200000,-2000000) #reptile
-rasterImage(fresh,-11950000,-3150000,-10950000,-1750000) #freshwater
-rasterImage(ant,-11000000,-3050000,-9200000,-1750000) #freshwater
-rasterImage(spider,-13700000,-4700000,-11800000,-2750000) #freshwater
-rasterImage(plant,-11900000,-4190000,-11000000,-3150000) #freshwater
-rasterImage(fungus,-11000000,-4400000,-9200000,-2800000) #freshwater
+#plot icons
+rasterImage(bird,-17100000,-1500000,-14700000,1150000) #bird
+rasterImage(mammal,-14200000,-1000000,-12500000,1100000) #mammal
+rasterImage(amph,-12100000,-1250000,-9200000,950000) #amphibian
+rasterImage(reptile,-16700000,-3100000,-14900000,-1600000) #reptile
+rasterImage(fresh,-14200000,-3680000,-12400000,-1120000) #freshwater
+rasterImage(ant,-12100000,-3350000,-9200000,-1270000) #ants
+rasterImage(spider,-17500000,-6400000,-14200000,-2950000) #spiders
+rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #plants
+rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
+#plot icons legend
+myGradientLegend(valRange = c(0, 50, 100),
+                 pos=c(0.04,0.16,0.235,.169),
+                 color = colramp(100),
+                 side = 1,
+                 n.seg = 1,
+                 values = c("0","50","100%"),
+                 cex = 1.3)
 
 ###### RANGE DYNAMICS
 
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon
+means_taxon$col_Rd
 
 amph <- gsub("^.{0,7}","#CA324C",icons[[1]])
 ant <- gsub("^.{0,7}","#9E0142",icons[[2]])
@@ -454,29 +481,38 @@ spider <- gsub("^.{0,7}","#9E0142",icons[[9]])
 ### PLOT
 
 par(mar=c(2,2,2,2))
-plot(shp2,border=NA,col=col_rd)
+plot(shp2,border=NA,col=shp_IPBES$col_rd)
 plot(worldmapframe,add=T)
 
-
+#plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.3,0,0.7,.015),
+                 pos=c(0.23,0,0.78,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1)
+                 cex = 1.3)
 
+## draw box
+rect(-17500000,-7600000,-9000000,1500000, col = "white")
 
-rasterImage(bird,-13400000,-2050000,-12100000,-500000) #bird
-rasterImage(mammal,-12000000,-1800000,-11000000,-550000) #mammal
-rasterImage(amph,-11000000,-1950000,-9200000,-700000) #amphibian
-rasterImage(reptile,-13300000,-2900000,-12200000,-2000000) #reptile
-rasterImage(fresh,-11950000,-3150000,-10950000,-1750000) #freshwater
-rasterImage(ant,-11000000,-3050000,-9200000,-1750000) #freshwater
-rasterImage(spider,-13700000,-4700000,-11800000,-2750000) #freshwater
-rasterImage(plant,-11900000,-4190000,-11000000,-3150000) #freshwater
-rasterImage(fungus,-11000000,-4400000,-9200000,-2800000) #freshwater
+#plot icons
+rasterImage(bird,-17100000,-1500000,-14700000,1150000) #bird
+rasterImage(mammal,-14200000,-1000000,-12500000,1100000) #mammal
+rasterImage(amph,-12100000,-1250000,-9200000,950000) #amphibian
+rasterImage(reptile,-16700000,-3100000,-14900000,-1600000) #reptile
+rasterImage(fresh,-14200000,-3680000,-12400000,-1120000) #freshwater
+rasterImage(ant,-12100000,-3350000,-9200000,-1270000) #ants
+rasterImage(spider,-17500000,-6400000,-14200000,-2950000) #spiders
+rasterImage(plant,-14100000,-5300000,-12300000,-3800000) #plants
+rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
-
-
+#plot icons legend
+myGradientLegend(valRange = c(0, 50, 100),
+                 pos=c(0.04,0.16,0.235,.169),
+                 color = colramp(100),
+                 side = 1,
+                 n.seg = 1,
+                 values = c("0","50","100%"),
+                 cex = 1.3)
 
