@@ -192,8 +192,9 @@ colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
 
 #populate the table with the colours to be plotted 
 
-col_burden <- colramp(100)[cut(log(shp_IPBES$burden), 
-                               breaks = 100)]
+col_burden <- colramp(100)[cut(log(c(1,shp_IPBES$burden)), 
+                               breaks = 100)][-1]
+
 shp_IPBES$col_burden <- col_burden
 
 col_conf <- colramp(100)[cut(c(0,100,shp_IPBES$confirmed), 
@@ -252,8 +253,8 @@ means_taxon$species <- c(76,282,458,601,595,221,12704,197,267)
 
 #populate the table with the colours to be plotted 
 
-colours_burden <- colramp(100)[cut(log(means_taxon$species), 
-                                   breaks = 100)]
+colours_burden <- colramp(100)[cut(log(c(1,means_taxon$species)), 
+                                   breaks = 100)][-1]
 
 means_taxon$col_burden <- colours_burden
 
@@ -286,15 +287,15 @@ icons <- lapply(a,as.raster)
 
 means_taxon[,c(1,7)]
 
-amph <- gsub("^.{0,7}","#9E0142",icons[[1]])
-ant <- gsub("^.{0,7}","#F88F52",icons[[2]])
-bird <- gsub("^.{0,7}","#FDC877",icons[[3]])
-fresh <- gsub("^.{0,7}","#FEE18D",icons[[4]])
-fungus <- gsub("^.{0,7}","#FEE18D",icons[[5]])
-mammal <- gsub("^.{0,7}","#F46E43",icons[[6]])
+amph <- gsub("^.{0,7}","#FEF0A7",icons[[1]])
+ant <- gsub("^.{0,7}","#E7F599",icons[[2]])
+bird <- gsub("^.{0,7}","#CAE99D",icons[[3]])
+fresh <- gsub("^.{0,7}","#B8E2A1",icons[[4]])
+fungus <- gsub("^.{0,7}","#B8E2A1",icons[[5]])
+mammal <- gsub("^.{0,7}","#ECF7A1",icons[[6]])
 plant <- gsub("^.{0,7}","#5E4FA2",icons[[7]])
-reptile <- gsub("^.{0,7}","#EE6445",icons[[8]])
-spider <- gsub("^.{0,7}","#F7884F",icons[[9]])
+reptile <- gsub("^.{0,7}","#F1F9A9",icons[[8]])
+spider <- gsub("^.{0,7}","#E7F599",icons[[9]])
 
 ### PLOT
 
@@ -307,17 +308,17 @@ myGradientLegend(valRange = c(min(shp_IPBES$burden), max(shp_IPBES$burden)),
                  pos=c(0.23,0,0.78,.017),
                  color = colramp(100), 
                  side = 1,
-                 n.seg = c(min(shp_IPBES$burden),
+                 n.seg = c(0,
                            max(shp_IPBES$burden)/4,
                            max(shp_IPBES$burden)/2,
                            max(shp_IPBES$burden)*3/4,
                            max(shp_IPBES$burden)),
-                 values = c(paste(round(exp(log(min(shp_IPBES$burden))))),
+                 values = c("0",
                             paste(round(exp(log(max(shp_IPBES$burden))/4))),
                             paste(round(exp(log(max(shp_IPBES$burden))/2))),
                             paste(round(exp(log(max(shp_IPBES$burden))*3/4))),
                             paste(max(shp_IPBES$burden))),
-                 cex = 1.3)
+                 cex = 2.5)
 
 ## draw box
 rect(-17500000,-7600000,-9000000,1500000, col = "white")
@@ -336,20 +337,22 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 #plot icons legend
 myGradientLegend(valRange = c(min(means_taxon$species),
                               max(means_taxon$species)), 
-                 pos=c(0.04,0.16,0.235,.169),
+                 pos=c(0.035,0.16,0.230,.169),
                  color = colramp(100), 
                  side = 1,
-                 n.seg = c(min(means_taxon$species),
+                 n.seg = c(0,
                            max(means_taxon$species)/4,
                            max(means_taxon$species)/2,
                            max(means_taxon$species)*3/4,
                            max(means_taxon$species)),
-                 values = c(paste(round(exp(log(min(means_taxon$species))))),
+                 values = c("0",
                             paste(round(exp(log(max(means_taxon$species))/4))),
                             paste(round(exp(log(max(means_taxon$species))/2))),
-                            paste(round(exp(log(max(means_taxon$species))*3/4))),
-                            paste(max(means_taxon$species))),
-                 cex = 1.3)
+                            #paste(round(exp(log(max(means_taxon$species))*3/4))),
+                            "1K",
+                            # paste(max(means_taxon$species))
+                            "13K"),
+                 cex = 2)
 
 ###### CONFIRMED
 
@@ -381,7 +384,7 @@ myGradientLegend(valRange = c(0, 50, 100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
+                 cex = 2.5)
 
 ## draw box
 rect(-17500000,-7600000,-9000000,1500000, col = "white")
@@ -399,12 +402,12 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.04,0.16,0.235,.169),
+                 pos=c(0.035,0.16,0.230,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
+                 cex = 2)
 
 ###### MODELLING
 
