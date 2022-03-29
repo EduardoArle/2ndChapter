@@ -100,7 +100,7 @@ rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
 
 
-### plot results represented by colour in a table (all in base, bitch)
+### plot results represented by colour in a table (all in base, b)
 
 #create colour ramp to represent the values
 colramp0 <- colorRampPalette(c("#fe0002", "#d80027", "#a1015d",
@@ -187,7 +187,7 @@ axis(side = 1,
 #rotate 60 degrees (srt = 60)
 text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
      par("usr")[3]-0.35, 
-     srt = 45, adj = 1, xpd = TRUE,
+     srt = 35, adj = 1, xpd = TRUE,
      labels = confirmed$cont_short, cex.axis = .8)
 
 

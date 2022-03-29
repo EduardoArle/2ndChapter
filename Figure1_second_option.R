@@ -9,7 +9,8 @@ wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
 wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
 wd_icons <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Figure1/Icons"
 wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
-
+wd_SI <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI"
+  
 #list taxa
 setwd(wd_results)
 taxa <- list.files()
@@ -184,6 +185,9 @@ for(i in 1:nrow(shp_IPBES))
   shp_IPBES$rd[i] <- rd_continent$average[a] 
 }
 
+setwd(wd_SI)
+write.csv(shp_IPBES@data,"Values_FIG_1_regions.csv",row.names = F)
+
 #create colour ramp to represent the values
 colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
                               "#fdae61", "#fee08b", "#ffffbf",
@@ -250,6 +254,9 @@ means_taxon <- ddply(results3,.(Taxon),
                      entries = sum(n_sps))
 
 means_taxon$species <- c(76,282,458,601,595,221,12704,197,267)
+
+setwd(wd_SI)
+write.csv(means_taxon,"Values_FIG_1_taxa.csv",row.names = F)
 
 #populate the table with the colours to be plotted 
 
@@ -439,7 +446,7 @@ myGradientLegend(valRange = c(0, 50, 100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
+                 cex = 2.5)
 
 ## draw box
 rect(-17500000,-7600000,-9000000,1500000, col = "white")
@@ -457,12 +464,12 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.04,0.16,0.235,.169),
+                 pos=c(0.035,0.16,0.230,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
+                 cex = 2)
 
 ###### RANGE DYNAMICS
 
@@ -494,7 +501,7 @@ myGradientLegend(valRange = c(0, 50, 100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
+                 cex = 2.5)
 
 ## draw box
 rect(-17500000,-7600000,-9000000,1500000, col = "white")
@@ -512,10 +519,9 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.04,0.16,0.235,.169),
+                 pos=c(0.035,0.16,0.230,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
                  values = c("0","50","100%"),
-                 cex = 1.3)
-
+                 cex = 2)
