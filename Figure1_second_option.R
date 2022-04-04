@@ -312,7 +312,7 @@ plot(worldmapframe,add=T)
 
 #plot map legend
 myGradientLegend(valRange = c(min(shp_IPBES$burden), max(shp_IPBES$burden)), 
-                 pos=c(0.23,0,0.78,.017),
+                 pos=c(0.28,0,0.73,.017),
                  color = colramp(100), 
                  side = 1,
                  n.seg = c(0,
@@ -344,7 +344,7 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 #plot icons legend
 myGradientLegend(valRange = c(min(means_taxon$species),
                               max(means_taxon$species)), 
-                 pos=c(0.035,0.16,0.230,.169),
+                 pos=c(0.118,0.16,0.28,.169),
                  color = colramp(100), 
                  side = 1,
                  n.seg = c(0,
@@ -366,13 +366,13 @@ myGradientLegend(valRange = c(min(means_taxon$species),
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon$col_conf
+means_taxon[c(1,2,8)]
 
-amph <- gsub("^.{0,7}","#6EC5A4",icons[[1]])
+amph <- gsub("^.{0,7}","#75C8A4",icons[[1]])
 ant <- gsub("^.{0,7}","#FDD27F",icons[[2]])
 bird <- gsub("^.{0,7}","#429AB5",icons[[3]])
 fresh <- gsub("^.{0,7}","#FEFAB7",icons[[4]])
-fungus <- gsub("^.{0,7}","#FDD784",icons[[5]])
+fungus <- gsub("^.{0,7}","#FDD27F",icons[[5]])
 mammal <- gsub("^.{0,7}","#D6EE9B",icons[[6]])
 plant <- gsub("^.{0,7}","#FEFAB7",icons[[7]])
 reptile <- gsub("^.{0,7}","#83CDA4",icons[[8]])
@@ -386,7 +386,7 @@ plot(worldmapframe,add=T)
 
 #plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.23,0,0.78,.017),
+                 pos=c(0.28,0,0.73,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
@@ -409,7 +409,7 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.035,0.16,0.230,.169),
+                 pos=c(0.118,0.16,0.277,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
@@ -421,17 +421,17 @@ myGradientLegend(valRange = c(0, 50, 100),
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon$col_mod
+means_taxon[,c(1,3,9)]
 
-amph <- gsub("^.{0,7}","#FEEA9C",icons[[1]])
-ant <- gsub("^.{0,7}","#F57446",icons[[2]])
-bird <- gsub("^.{0,7}","#8AD0A4",icons[[3]])
-fresh <- gsub("^.{0,7}","#E2F398",icons[[4]])
-fungus <- gsub("^.{0,7}","#F88F52",icons[[5]])
-mammal <- gsub("^.{0,7}","#FA9C58",icons[[6]])
-plant <- gsub("^.{0,7}","#F8FCB5",icons[[7]])
-reptile <- gsub("^.{0,7}","#FEF0A7",icons[[8]])
-spider <- gsub("^.{0,7}","#F16943",icons[[9]])
+amph <- gsub("^.{0,7}","#8AD0A4",icons[[1]])
+ant <- gsub("^.{0,7}","#FBA25B",icons[[2]])
+bird <- gsub("^.{0,7}","#3D94B7",icons[[3]])
+fresh <- gsub("^.{0,7}","#ACDDA3",icons[[4]])
+fungus <- gsub("^.{0,7}","#FDB96A",icons[[5]])
+mammal <- gsub("^.{0,7}","#FBFDB9",icons[[6]])
+plant <- gsub("^.{0,7}","#B8E2A1",icons[[7]])
+reptile <- gsub("^.{0,7}","#E2F398",icons[[8]])
+spider <- gsub("^.{0,7}","#FA9C58",icons[[9]])
 
 ### PLOT
 
@@ -441,7 +441,7 @@ plot(worldmapframe,add=T)
 
 #plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.23,0,0.78,.017),
+                 pos=c(0.28,0,0.73,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
@@ -464,7 +464,7 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.035,0.16,0.230,.169),
+                 pos=c(0.118,0.16,0.277,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
@@ -476,7 +476,7 @@ myGradientLegend(valRange = c(0, 50, 100),
 #manually changing the HEX values before the transparency to
 #the colours selected to plot each taxon icon
 
-means_taxon$col_Rd
+means_taxon[,c(1,4,10)]
 
 amph <- gsub("^.{0,7}","#CA324C",icons[[1]])
 ant <- gsub("^.{0,7}","#9E0142",icons[[2]])
@@ -496,7 +496,7 @@ plot(worldmapframe,add=T)
 
 #plot map legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.23,0,0.78,.017),
+                 pos=c(0.28,0,0.73,.017),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,
@@ -519,7 +519,7 @@ rasterImage(fungus,-12200000,-5800000,-9200000,-3250000) #fungi
 
 #plot icons legend
 myGradientLegend(valRange = c(0, 50, 100),
-                 pos=c(0.035,0.16,0.230,.169),
+                 pos=c(0.118,0.16,0.277,.169),
                  color = colramp(100),
                  side = 1,
                  n.seg = 1,

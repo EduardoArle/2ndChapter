@@ -6,6 +6,7 @@ wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Simplified_FreshWa
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater/Data/datatoFigshare"
 wd_freshwater <- "C:/Users/ca13kute/Documents/2nd_Chapter/Freshwater"
 wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+wd_pts_cont <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Points_continent"
 
 #load shp
 shp <- readOGR("Basin042017_3119",dsn = wd_shp,
@@ -153,12 +154,16 @@ setwd(wd_cont_burden)
 write.csv(sps_reg_list6,"Freshwater_continent.csv",row.names = F)
 
 
-#merge continent info into sps_reg_count2
-names(sps_reg_count2)[3] <- "Region"
-sps_reg_count3 <- merge(sps_reg_count2,reg_continent,by="Region")
+#merge continent info into sps_reg_count
+names(sps_reg_count)[3] <- "Region"
+sps_reg_count3 <- merge(sps_reg_count,reg_continent,by="Region")
 sps_reg_count3$sps_cont <- paste(sps_reg_count3$species,
                                  sps_reg_count3$Continent,
                                  sep="_")
+
+#save count with continent info
+setwd(wd_pts_cont)
+write.csv(sps_reg_count3,"Freshwaterfish_continent.csv",row.names = F)
 
 #count sps_continent number of occurrences
 sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
@@ -208,6 +213,9 @@ sps_reg_count3 <- sps_reg_count3[which(sps_reg_count3$year >= 1970 &
 
 #create column informing to with lustre the occurrences belong
 sps_reg_count3$lustre <- floor((sps_reg_count3$year - 1970) / 5) + 1
+
+#change col name from "" to "Region" 
+names(sps_reg_count3)[3] <- "Region"
 
 #count sps_reg occurrence in the 5 year period
 sps_reg_count4 <- ddply(sps_reg_count3,.(species,Region,sps_reg,lustre),
@@ -305,7 +313,7 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
                             paste(round(exp(log(max(shp3$n_sps))/2))),
                             paste(round(exp(log(max(shp3$n_sps))*3/4))),
                             paste(max(shp3$n_sps))),
-                 cex = 1)
+                 cex = 1.5)
 
 ##### PLOT THE CONFIRMED MAP
 
@@ -340,7 +348,7 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)
 
 
 ##### PLOT THE MODELLING MAP
@@ -376,7 +384,7 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)
 
 
 ##### PLOT THE RANGE DYNAMICS MAP
@@ -412,4 +420,4 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)

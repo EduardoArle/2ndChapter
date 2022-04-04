@@ -4,7 +4,9 @@ library(plotfunctions);library(maptools);library(rworldmap)
 #list WDs
 wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi/Shapefile"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Fungi"
+wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+wd_pts_cont <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Points_continent"
 
 #load shp
 shp <- readOGR("Shapefile_fungi",dsn = wd_shp,
@@ -49,7 +51,7 @@ missing
 
 sps_reg_count$Region <- as.character(sps_reg_count$Region)
 
-sps_reg_count$Region[which(sps_reg_count$Region == "EspÃ­rito Santo" )] <- "Espírito Santo"
+sps_reg_count$Region[which(sps_reg_count$Region == "Espírito Santo" )] <- "Espírito Santo"
 
 #create column with species and region info in the occurrence count table
 sps_reg_count$sps_reg <- paste0(sps_reg_count$species,"_",
@@ -64,7 +66,7 @@ sps_reg_list2 <- merge(sps_reg_list,harmo2,
                        by.x = "species",
                        by.y = "entry")
 
-#create column with species and region info in the ants table
+#create column with species and region info in the fungi table
 sps_reg_list2$sps_reg <- paste0(sps_reg_list2$gbifDarwinCore,"_",
                                 sps_reg_list2$FungiRegion)
 
@@ -130,22 +132,28 @@ sps_reg_list4 <- merge(sps_reg_list3,reg_continent,
                        by.x = "FungiRegion",
                        by.y = "Region")
 
+#create a col with sps_cont
 sps_reg_list4$sps_cont <- paste(sps_reg_list4$gbifDarwinCore,
                                 sps_reg_list4$Continent,
                                 sep="_")
 
-#save checklist table with continent info to calculate the burder
+#save checklist table with continent info to calculate the burden
 setwd(wd_cont_burden)
 
 write.csv(sps_reg_list4,"Fungi_continent.csv",row.names = F)
 
 
-#merge continent info into sps_reg_count2
-names(sps_reg_count2)[3] <- "Region"
-sps_reg_count3 <- merge(sps_reg_count2,reg_continent,by="Region")
+#merge continent info into sps_reg_count 
+names(sps_reg_count)[3] <- "Region"
+sps_reg_count3 <- merge(sps_reg_count,reg_continent,by="Region")
 sps_reg_count3$sps_cont <- paste(sps_reg_count3$species,
                                  sps_reg_count3$Continent,
                                  sep="_")
+
+#save count with continent info
+setwd(wd_pts_cont)
+write.csv(sps_reg_count3,"Fungi_continent.csv",row.names = F)
+
 
 #count sps_continent number of occurrences
 sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
@@ -153,7 +161,7 @@ sps_cont_n <- ddply(sps_reg_count3,.(sps_cont),nrow)
 #eliminate rows with less than 50 occurrences
 sps_cont_n2 <- sps_cont_n[which(sps_cont_n$V1 >=50),]
 
-#check which sps_continent combination in the ants table have at 
+#check which sps_continent combination in the fungi table have at 
 #least 50 GBIF occurrence
 sps_reg_list4$modelling <- as.numeric(sps_reg_list4$sps_cont %in% 
                                         sps_cont_n2$sps_cont)
@@ -303,7 +311,7 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
                             paste(round(exp(log(max(shp3$n_sps))/2))),
                             paste(round(exp(log(max(shp3$n_sps))*3/4))),
                             paste(max(shp3$n_sps))),
-                 cex = 1)
+                 cex = 1.5)
 
 
 ##### PLOT THE CONFIRMED MAP
@@ -339,7 +347,7 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)
 
 ##### PLOT THE MODELLING MAP
 
@@ -374,7 +382,7 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)
 
 
 ##### PLOT THE RANGE DYNAMICS MAP
@@ -410,4 +418,4 @@ myGradientLegend(valRange = c(0, 100),
                  side = 1,
                  n.seg = 0,
                  values = c("0","100%"),
-                 cex = 1)
+                 cex = 1.5)

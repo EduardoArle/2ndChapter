@@ -3,6 +3,7 @@ library(plyr);library(png)
 #paths
 wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
 wd_icons <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Figure1/Icons"
+wd_values_fig2 <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Values_FIG_2"
 
 #list taxa
 setwd(wd_results)
@@ -56,6 +57,9 @@ confirmed$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 confirmed <- confirmed[,c(1,11,6,8,10,3,5,9,2,7,4)]
 confirmed <- confirmed[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
+#save table
+setwd(wd_values_fig2)
+write.csv(confirmed,"Confirmed.csv",row.names = F)
 
 modelling <- means[[1]][,c(1,3)]
 
@@ -77,6 +81,9 @@ modelling$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 modelling <- modelling[,c(1,11,6,8,10,3,5,9,2,7,4)]
 modelling <- modelling[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
+#save table
+setwd(wd_values_fig2)
+write.csv(modelling,"Modelling.csv",row.names = F)
 
 rd <- means[[1]][,c(1,4)]
 
@@ -98,6 +105,9 @@ rd$cont_short[c(4,6)] <- c("Western Europe","East Africa")
 rd <- rd[,c(1,11,6,8,10,3,5,9,2,7,4)]
 rd <- rd[c(4,7,11,14,8,2,12,16,17,10,6,3,5,9,13,15,18,1),]
 
+#save table
+setwd(wd_values_fig2)
+write.csv(rd,"Range_dynamics.csv",row.names = F)
 
 
 ### plot results represented by colour in a table (all in base, b)
@@ -274,7 +284,7 @@ axis(side = 1,
 #rotate 60 degrees (srt = 60)
 text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
      par("usr")[3]-0.35, 
-     srt = 45, adj = 1, xpd = TRUE,
+     srt = 35, adj = 1, xpd = TRUE,
      labels = confirmed$cont_short, cex.axis = .8)
 
 axis(side = 2, 
@@ -360,7 +370,7 @@ axis(side = 1,
 #rotate 60 degrees (srt = 60)
 text(seq(10/cols/2,(10/cols/2)+(10/cols*(cols-1)),by = 10/cols), 
      par("usr")[3]-0.35, 
-     srt = 45, adj = 1, xpd = TRUE,
+     srt = 35, adj = 1, xpd = TRUE,
      labels = confirmed$cont_short, cex.axis = .8)
 
 axis(side = 2, 
