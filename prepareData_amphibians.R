@@ -5,7 +5,6 @@ library(plotfunctions);library(maptools);library(rworldmap)
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Regions_shapefile"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles"
 wd_amph <- "C:/Users/ca13kute/Documents/2nd_Chapter/Amphibians and Reptiles/Amphibians"
-wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 wd_pts_cont <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Points_continent"
 
@@ -90,7 +89,7 @@ sps_reg_list_amph2 <- unique(as.data.table(sps_reg_list_amph), #the table has to
 
 #save final checklist table (harmonised names and no duplicates)
 
-setwd(wd_harmo_cl)
+setwd(wd_amph)
 write.csv(sps_reg_list_amph2,"Final_checklist_amphibians.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the amphibian table

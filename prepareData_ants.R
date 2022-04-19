@@ -4,7 +4,6 @@ library(plotfunctions);library(maptools);library(rworldmap)
 #list WDs
 wd_shp <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants/Bentity2_shapefile_fullres/Bentity2_shapefile_fullres"
 wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/Ants"
-wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
 wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
 wd_pts_cont <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Points_continent"
 
@@ -83,7 +82,7 @@ sps_reg_list3 <- unique(as.data.table(sps_reg_list2), #the table has to be in
 
 #save final checklist table (harmonised names and no duplicates)
 
-setwd(wd_harmo_cl)
+setwd(wd_table)
 write.csv(sps_reg_list3,"Final_checklist_ants.csv")
 
 #eliminate rows combining sps_reg_count that are not listed in the taxon occurrence table

@@ -38,6 +38,8 @@ missing
 #eliminate entries not represented in the shp
 sps_reg_list3 <- sps_reg_list2[-which(sps_reg_list2$name %in% missing),]
 
+write.csv(sps_reg_list3,"Taxon_x_List_GloNAF_modified.csv", row.names = F)
+
 #make a sps list
 sps_list <- unique(sps_reg_list3$standardized_name)
 
@@ -313,6 +315,40 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
                             paste(max(shp3$n_sps))),
                  cex = 1.5)
 
+#########################################
+##### second option of colours
+#########################################
+
+#create colour ramp to represent the values
+# colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
+#                               "#fdae61", "#fee08b", "#ffffbf",
+#                               "#e6f598", "#abdda4", "#66c2a5",
+#                               "#3288bd", "#5e4fa2"))
+
+#populate the table with the colours to be plotted 
+
+# col_n_sps <- colramp(100)[cut(log(c(1,shp3$n_sps)), 
+#                                breaks = 100)][-1]
+# 
+# par(mar=c(2,2,2,2))
+# 
+# plot(worldmapframe)
+# plot(w_map,add=T,col="gray80",border=NA)
+# plot(shp3,col=col_n_sps,add=T,border=NA)
+
+
+# could not plot values the way I want (log) adapt the function
+# myGradientLegend(valRange = c(1, max(shp3$n_sps)), 
+#                  pos=c(0.3,0,0.7,.015),
+#                  color = colramp(100), 
+#                  side = 1,
+#                  n.seg = c(1,max(shp3$n_sps)/4,max(shp3$n_sps)/2,
+#                            max(shp3$n_sps)*3/4,max(shp3$n_sps)),
+#                  values = c("1",paste(round(exp(log(max(shp3$n_sps))/4))),
+#                             paste(round(exp(log(max(shp3$n_sps))/2))),
+#                             paste(round(exp(log(max(shp3$n_sps))*3/4))),
+#                             paste(max(shp3$n_sps))),
+#                  cex = 3)
 
 ##### PLOT THE CONFIRMED MAP
 
