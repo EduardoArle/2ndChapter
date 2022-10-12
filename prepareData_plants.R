@@ -197,7 +197,7 @@ for(i in 1:nrow(shp2))
 
 ###### calculate range dynamics evidence
 
-#eliminate rows corresponding to years before 1980 and after 2019
+#eliminate rows corresponding to years before 1970 and after 2019
 #as well as rows not containing year information
 sps_reg_count3 <- sps_reg_count2[which(!is.na(sps_reg_count2$year)),]
 sps_reg_count3 <- sps_reg_count3[which(sps_reg_count3$year >= 1970 &
@@ -327,20 +327,20 @@ myGradientLegend(valRange = c(0, max(shp3$n_sps)),
 
 #populate the table with the colours to be plotted 
 
-# col_n_sps <- colramp(100)[cut(log(c(1,shp3$n_sps)), 
+# col_n_sps <- colramp(100)[cut(log(c(1,shp3$n_sps)),
 #                                breaks = 100)][-1]
 # 
-# par(mar=c(2,2,2,2))
+# par(mar=c(3,2,2,2))
 # 
 # plot(worldmapframe)
 # plot(w_map,add=T,col="gray80",border=NA)
 # plot(shp3,col=col_n_sps,add=T,border=NA)
-
-
-# could not plot values the way I want (log) adapt the function
-# myGradientLegend(valRange = c(1, max(shp3$n_sps)), 
+# 
+# 
+# # could not plot values the way I want (log) adapt the function
+# myGradientLegend(valRange = c(1, max(shp3$n_sps)),
 #                  pos=c(0.3,0,0.7,.015),
-#                  color = colramp(100), 
+#                  color = colramp(100),
 #                  side = 1,
 #                  n.seg = c(1,max(shp3$n_sps)/4,max(shp3$n_sps)/2,
 #                            max(shp3$n_sps)*3/4,max(shp3$n_sps)),
