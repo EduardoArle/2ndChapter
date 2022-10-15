@@ -2,9 +2,9 @@ library(plyr);library(rgdal);library(raster);library(data.table)
 library(plotfunctions);library(maptools);library(rworldmap)
 
 #list WDs
-wd_shp <-  "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GloNAF_modified_shp"
-wd_table <- "C:/Users/ca13kute/Documents/2nd_Chapter/GloNAF_Data/GLONAF"
-wd_harmo_cl <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Table 1/Final checklists"
+wd_shp <-  "/Users/carloseduardoaribeiro/Documents/GloNAF/Modified shapefile"
+wd_table <- "/Users/carloseduardoaribeiro/Documents/GloNAF"
+wd_harmo_cl <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Tables/Final checklists"
 wd_pts_cont <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI/Points_continent"
 
 #load shp
@@ -16,7 +16,12 @@ shp <- readOGR("GloNAF_modified",dsn = wd_shp,
 setwd(wd_table)
 sps_reg_list <- read.csv("Taxon_x_List_GloNAF_fixed.csv") #load table
 
-regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv") #table 
+
+#########   NOT READING SPECIAL CHARACTER HERE ON THE MAC SOLVE #########
+
+regions <- read.csv("Region_GloNAF_vanKleunenetal2018Ecology.csv",
+                    encoding="Latin-1") #table 
+
 #translating regions ID, names etc
 
 #make a table to include region name and obj ID into the tables
@@ -136,8 +141,8 @@ sps_reg_list6$sps_cont <- paste(sps_reg_list6$gbifDarwinCore,
                                 sps_reg_list6$Continent,
                                 sep="_")
 
-#save checklist table with continent info to calculate the burder
-setwd(wd_cont_burden)
+#save checklist table with continent info to calculate the burden
+setwd(wd_table)
 
 write.csv(sps_reg_list6,"Plants_continent.csv",row.names = F)
 
@@ -245,14 +250,14 @@ table_res <- shp2@data
 table_res2 <- table_res[,c(6,10,8,7,9,11)]
 names(table_res2)[1] <- "Region"
 
-setwd("C:/Users/ca13kute/Documents/2nd_Chapter/Results/plants/Tables")
-write.csv(table_res2,"Indices_plants_region.csv",row.names = F)
+setwd("/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Results")
+write.csv(table_res2,"MDA_plants_region.csv",row.names = F)
 
 
 ### plot maps
 
 # Load world map frame and continent outline
-setwd("C:/Users/ca13kute/Documents/sTWIST")
+setwd("/Users/carloseduardoaribeiro/Documents/Soup/Map stuff")
 
 world <- readRDS("wrld.rds")
 worldmapframe <- readRDS("Worldmapframe.rds")
