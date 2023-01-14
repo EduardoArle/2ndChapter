@@ -5,11 +5,13 @@ library(png);library(data.table)
 #### to plot the maps' legends
 
 #paths
-wd_results <- "C:/Users/ca13kute/Documents/2nd_Chapter/Results"
-wd_IPBES <- "C:/Users/ca13kute/Documents/2nd_Chapter/IPBES/Simplified_shp"
-wd_icons <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/Figure1/Icons"
-wd_cont_burden <- "C:/Users/ca13kute/Documents/2nd_Chapter/Species_burden_continent"
-wd_SI <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI"
+#wd_results <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Results"
+wd_results <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Results"
+wd_IPBES <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/IPBES/Simplified_shp"
+wd_icons <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Icons"
+wd_cont_burden <- "/Users/carloseduardoaribeiro/Documents/Global Alien Patterns/Species_burden_continent"
+wd_map_tools <- "/Users/carloseduardoaribeiro/Documents/Soup/Map stuff"
+## wd_SI <- "C:/Users/ca13kute/Documents/2nd_Chapter/Figures/SI"
   
 #list taxa
 setwd(wd_results)
@@ -219,7 +221,7 @@ shp_IPBES$col_rd <- col_rd
 ### plot maps
 
 # Load world map frame and continent outline
-setwd("C:/Users/ca13kute/Documents/sTWIST")
+setwd(wd_map_tools)
 
 world <- readRDS("wrld.rds")
 worldmapframe <- readRDS("Worldmapframe.rds")

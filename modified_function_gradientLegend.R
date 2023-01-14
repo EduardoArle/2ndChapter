@@ -95,6 +95,9 @@ myGradientLegend <- function (valRange, color = "terrain", nCol = 30, pos = 0.87
   vals <- seq(min(valRange), max(valRange), length = length(mycolors))
   im <- as.raster(mycolors[matrix(1:length(mycolors), ncol = 1)])
   n <- max(c(length(ticks) - 2, 0))
+  if (length(n.seg) > 1){
+    n.seg <- length(n.seg)
+  }
   if (side%%2 == 1) {
     im <- t(im)
     rasterImage(im, loc[1], loc[2], loc[3], loc[4], col = mycolors, 
